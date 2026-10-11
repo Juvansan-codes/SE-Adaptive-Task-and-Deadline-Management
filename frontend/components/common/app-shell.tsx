@@ -79,6 +79,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return matched ? matched.name : "Workspace"
   }, [isLinkActive])
 
+  // If on authentication route, render without dashboard shell
+  const isAuthRoute = pathname === "/login" || pathname === "/register"
+  if (isAuthRoute) {
+    return (
+      <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
+        {children}
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground">
       {/* Accessibility Skip Link */}
@@ -324,6 +334,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Right Header Area */}
           <div className="flex items-center gap-2.5">
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="text-xs">
+                Sign in
+              </Button>
+            </Link>
             <Badge
               variant="outline"
               className="hidden sm:flex items-center gap-1.5 py-1 text-xs font-normal border-border bg-background"

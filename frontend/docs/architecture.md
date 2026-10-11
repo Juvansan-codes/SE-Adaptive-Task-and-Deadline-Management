@@ -1,7 +1,7 @@
 # Frontend Architecture
 
 ## Overview
-This document outlines the directory structure, design system tokens, and application shell architecture for the **Adaptive Task & Deadline Management** frontend.
+This document outlines the directory structure, design system tokens, application shell architecture, and authentication subsystem for the **Adaptive Task & Deadline Management** frontend.
 
 ---
 
@@ -52,19 +52,44 @@ Minimalist, editorial, productivity-focused interface avoiding gradients, neon c
 - `Toaster` / `Sonner`: Toast notification provider
 
 ### Common State & Shell Components (`components/common/`)
-- `AppShell`: Persistent desktop sidebar, top bar, and mobile navigation drawer
+- `AppShell`: Persistent desktop sidebar, top bar, and mobile navigation drawer (automatically handles dedicated auth routes)
 - `EmptyState`: Clean empty state presentation with icon, title, description, and action slots
 - `LoadingState`: Accessible loading indicator with reduced-motion support
 - `ErrorState`: Alert box with retry trigger and error messaging
 
+### Authentication Components (`components/auth/`)
+- `AuthCard`: Focused container layout with brand header, restrained card border, and prototype mode badge
+- `PasswordInput`: Text input with accessible show/hide password visibility toggle button
+
+---
+
+## Authentication Architecture (Phase 2)
+
+### Mock Service (`services/mock/auth.ts`)
+The mock authentication layer implements `IAuthService` with typed asynchronous operations simulating network latency:
+- **`login(credentials)`**: Simulates login verification.
+- **`register(payload)`**: Simulates account registration and duplicate email detection.
+- **Substitution Ready:** UI form components depend strictly on the `IAuthService` contract, enabling drop-in replacement by a FastAPI backend client in future phases without rewriting page forms.
+
+### Test Simulation Scenarios
+- **Default Success:** `demo@example.com` / `Password123!` (or any valid email & password ≥ 6 characters).
+- **Invalid Credentials Error:** `invalid@example.com` -> triggers "Invalid email or password."
+- **Locked Account Error:** `locked@example.com` -> triggers "This account has been temporarily locked."
+- **Duplicate Registration Error:** `user@example.com` or `exists@example.com` -> triggers "An account with this email address already exists."
+
+### Validation Schemas (`lib/validations/auth.ts`)
+- **`loginSchema`**:
+  - `email`: Required, valid email format.
+  - `password`: Required non-empty string.
+- **`registerSchema`**:
+  - `name`: Required, min 2 characters.
+  - `email`: Required, valid email format.
+  - `password`: Required, min 8 characters.
+  - `confirmPassword`: Required, validated via Zod `.refine()` to ensure matching passwords.
+
 ---
 
 ## Application Shell & Routing
-
-### Shell Layout
-- **Desktop Sidebar:** Fixed 256px (`w-64`) left sidebar with brand logo, main navigation, and status badge.
-- **Top Bar:** Sticky header with current route title, breadcrumb, and mobile menu trigger.
-- **Mobile Navigation:** Slide-out drawer with backdrop blur, touch-friendly targets (`min-h-[44px]`), and escape key listener.
 
 ### Core Routes
 - `/`: Automatically redirects to `/dashboard`
@@ -72,6 +97,8 @@ Minimalist, editorial, productivity-focused interface avoiding gradients, neon c
 - `/tasks`: Workload and task management placeholder
 - `/schedule`: Adaptive scheduling and timeline forecasting placeholder
 - `/settings`: Preference configuration and component showcase
+- `/login`: Standalone focused authentication page
+- `/register`: Standalone focused registration page
 
 ---
 
@@ -83,11 +110,16 @@ frontend/
 │   ├── tasks/page.tsx        # Tasks route
 │   ├── schedule/page.tsx     # Schedule route
 │   ├── settings/page.tsx     # Settings & component showcase route
+│   ├── login/page.tsx        # Login authentication route
+│   ├── register/page.tsx     # Registration authentication route
 │   ├── globals.css           # Design tokens, theme variables, and reset
 │   ├── layout.tsx            # Root layout wrapping AppShell & Providers
 │   ├── page.tsx              # Root route redirect
 │   └── providers.tsx         # TanStack Query & Sonner providers
 ├── components/
+│   ├── auth/
+│   │   ├── auth-card.tsx     # Focused auth page container
+│   │   └── password-input.tsx# Password input with show/hide toggle
 │   ├── common/
 │   │   ├── app-shell.tsx     # Desktop sidebar, mobile drawer, topbar
 │   │   ├── empty-state.tsx   # Reusable empty state component
@@ -98,7 +130,15 @@ frontend/
 ├── docs/
 │   └── architecture.md       # Technical architecture specification
 ├── lib/
+│   ├── validations/
+│   │   └── auth.ts           # Zod login & registration schemas
 │   └── utils.ts              # Class merging utilities
 ├── public/                   # Static assets
-└── services/                 # API configuration and clients
+├── services/
+│   ├── api/                  # API configuration and client modules
+│   └── mock/
+│       └── auth.ts           # Mock authentication service implementation
+└── types/
+    ├── auth.ts               # Authentication domain types
+    └── index.ts              # Global type exports
 ```
