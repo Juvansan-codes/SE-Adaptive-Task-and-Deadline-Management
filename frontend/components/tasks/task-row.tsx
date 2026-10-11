@@ -53,11 +53,16 @@ export function TaskRow({
           >
             {task.title}
           </Link>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
             <span className="font-normal">{task.category}</span>
             <span>•</span>
             <span className="tabular-nums">
               {task.completedDuration}h of {task.estimatedDuration}h
+            </span>
+            <span className="sm:hidden">•</span>
+            <span className="sm:hidden inline-flex items-center gap-1.5">
+              <PriorityBadge priority={task.priority} showIcon={false} />
+              <DeadlineIndicator deadline={task.deadline} isCompleted={isCompleted} showRelative={false} />
             </span>
           </div>
         </div>

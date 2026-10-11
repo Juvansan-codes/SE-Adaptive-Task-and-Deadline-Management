@@ -85,7 +85,7 @@ export function OverviewStats({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5",
+        "grid grid-cols-1 min-[340px]:grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5",
         className
       )}
     >

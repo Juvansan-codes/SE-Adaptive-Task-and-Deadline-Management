@@ -194,7 +194,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-xs">
               <div className="flex items-center gap-2">
                 <span className="size-2 rounded-full bg-primary" />
-                <span className="font-medium text-foreground">Phase 1</span>
+                <span className="font-medium text-foreground">Adaptive Engine</span>
               </div>
               <Badge variant="outline" className="text-[10px] py-0 px-1.5 font-normal">
                 Active
@@ -352,7 +352,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* PAGE CONTENT CONTAINER */}
         <main id="main-content" className="flex-1 overflow-x-hidden">
-          <div className="mx-auto w-full max-w-6xl p-5 md:p-8 lg:p-10">
+          <div className="mx-auto w-full max-w-6xl p-3.5 sm:p-5 md:p-8 lg:p-10">
             {children}
           </div>
         </main>

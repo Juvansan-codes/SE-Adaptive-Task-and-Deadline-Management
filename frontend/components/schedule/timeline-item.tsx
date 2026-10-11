@@ -78,10 +78,10 @@ export function TimelineItem({
   return (
     <div
       id={item.id}
-      className={cn("relative flex gap-4 sm:gap-6", className)}
+      className={cn("relative flex gap-3 sm:gap-6", className)}
     >
       {/* Left Column: Time & Duration Indicator */}
-      <div className="flex w-24 sm:w-28 flex-col items-end pt-1 shrink-0 text-right">
+      <div className="flex w-20 sm:w-28 flex-col items-end pt-1 shrink-0 text-right">
         <span
           className={cn(
             "text-xs sm:text-sm font-semibold tracking-tight tabular-nums",
