@@ -1,7 +1,7 @@
 # Frontend Architecture
 
 ## Overview
-This document outlines the directory structure, design system tokens, application shell architecture, and authentication subsystem for the **Adaptive Task & Deadline Management** frontend.
+This document outlines the directory structure, design system tokens, application shell architecture, authentication subsystem, and task management subsystem for the **Adaptive Task & Deadline Management** frontend.
 
 ---
 
@@ -52,49 +52,65 @@ Minimalist, editorial, productivity-focused interface avoiding gradients, neon c
 - `Toaster` / `Sonner`: Toast notification provider
 
 ### Common State & Shell Components (`components/common/`)
-- `AppShell`: Persistent desktop sidebar, top bar, and mobile navigation drawer (automatically handles dedicated auth routes)
+- `AppShell`: Persistent desktop sidebar, top bar, and mobile navigation drawer
 - `EmptyState`: Clean empty state presentation with icon, title, description, and action slots
 - `LoadingState`: Accessible loading indicator with reduced-motion support
 - `ErrorState`: Alert box with retry trigger and error messaging
 
-### Authentication Components (`components/auth/`)
-- `AuthCard`: Focused container layout with brand header, restrained card border, and prototype mode badge
-- `PasswordInput`: Text input with accessible show/hide password visibility toggle button
+### Task Domain Components (`components/tasks/`)
+- `TaskCard`: Grid card view with progress bars, status badges, and quick actions
+- `TaskRow`: Dense row view for compact lists
+- `TaskList`: Complete task management container with search, multi-faceted filtering, sorting, view toggling, and delete confirmation dialog
+- `TaskForm`: Modal dialog form for creating and editing tasks with Zod validation
+- `TaskDetails`: Deep-dive inspector for `/tasks/[id]` with metadata, audit trail, and duration metrics
+- `PriorityBadge`: Semantic badge for critical, high, medium, and low priority
+- `DifficultyBadge`: Complexity indicator (easy, medium, hard)
+- `StatusBadge`: Semantic badge for pending, in_progress, completed, and overdue
+- `ProgressBar`: Progress visualization with duration indicators (`Xh / Yh`)
+- `DeadlineIndicator`: Date-fns powered deadline formatting with relative distance and overdue warning
 
 ---
 
-## Authentication Architecture (Phase 2)
+## Task Management Subsystem (Phase 3)
 
-### Mock Service (`services/mock/auth.ts`)
-The mock authentication layer implements `IAuthService` with typed asynchronous operations simulating network latency:
-- **`login(credentials)`**: Simulates login verification.
-- **`register(payload)`**: Simulates account registration and duplicate email detection.
-- **Substitution Ready:** UI form components depend strictly on the `IAuthService` contract, enabling drop-in replacement by a FastAPI backend client in future phases without rewriting page forms.
+### Task Model (`types/task.ts`)
+```ts
+interface Task {
+  id: string
+  title: string
+  description: string
+  category: string
+  deadline: string
+  priority: "low" | "medium" | "high" | "critical"
+  difficulty: "easy" | "medium" | "hard"
+  estimatedDuration: number
+  completedDuration: number
+  remainingDuration: number
+  progress: number
+  status: "pending" | "in_progress" | "completed" | "overdue"
+  createdAt: string
+  updatedAt: string
+}
+```
 
-### Test Simulation Scenarios
-- **Default Success:** `demo@example.com` / `Password123!` (or any valid email & password ≥ 6 characters).
-- **Invalid Credentials Error:** `invalid@example.com` -> triggers "Invalid email or password."
-- **Locked Account Error:** `locked@example.com` -> triggers "This account has been temporarily locked."
-- **Duplicate Registration Error:** `user@example.com` or `exists@example.com` -> triggers "An account with this email address already exists."
-
-### Validation Schemas (`lib/validations/auth.ts`)
-- **`loginSchema`**:
-  - `email`: Required, valid email format.
-  - `password`: Required non-empty string.
-- **`registerSchema`**:
-  - `name`: Required, min 2 characters.
-  - `email`: Required, valid email format.
-  - `password`: Required, min 8 characters.
-  - `confirmPassword`: Required, validated via Zod `.refine()` to ensure matching passwords.
+### Mock Service (`services/mock/tasks.ts`)
+- **In-Memory Store:** Shared `mockTasksStore` maintaining state across client navigations.
+- **Service API:**
+  - `getTasks(filter)`: Multi-criteria filtering by text, category, priority, status, and sorting.
+  - `getTask(id)`: Single task retrieval with not-found handling.
+  - `createTask(data)`: Appends task with auto-computed remaining duration and progress percentage.
+  - `updateTask(id, updates)`: Updates task and recalculates progress/status.
+  - `deleteTask(id)`: Removes task from storage.
+  - `getCategories()`: Returns distinct categories for dynamic filter pills.
+- **TanStack Query Hooks (`hooks/use-tasks.ts`):** Reactive query and mutation bindings with automatic cache invalidation on mutations.
 
 ---
 
-## Application Shell & Routing
-
-### Core Routes
+## Core Routes
 - `/`: Automatically redirects to `/dashboard`
 - `/dashboard`: High-level overview placeholder
-- `/tasks`: Workload and task management placeholder
+- `/tasks`: Comprehensive task list and task management interface
+- `/tasks/[id]`: Dynamic task details route with edit, status, and delete controls
 - `/schedule`: Adaptive scheduling and timeline forecasting placeholder
 - `/settings`: Preference configuration and component showcase
 - `/login`: Standalone focused authentication page
@@ -106,39 +122,39 @@ The mock authentication layer implements `IAuthService` with typed asynchronous 
 ```
 frontend/
 ├── app/
-│   ├── dashboard/page.tsx    # Dashboard route
-│   ├── tasks/page.tsx        # Tasks route
-│   ├── schedule/page.tsx     # Schedule route
-│   ├── settings/page.tsx     # Settings & component showcase route
-│   ├── login/page.tsx        # Login authentication route
-│   ├── register/page.tsx     # Registration authentication route
-│   ├── globals.css           # Design tokens, theme variables, and reset
-│   ├── layout.tsx            # Root layout wrapping AppShell & Providers
-│   ├── page.tsx              # Root route redirect
-│   └── providers.tsx         # TanStack Query & Sonner providers
+│   ├── dashboard/page.tsx        # Dashboard route
+│   ├── tasks/
+│   │   ├── page.tsx              # Tasks list route
+│   │   └── [id]/page.tsx         # Dynamic task detail route
+│   ├── schedule/page.tsx         # Schedule route
+│   ├── settings/page.tsx         # Settings & component showcase route
+│   ├── login/page.tsx            # Login authentication route
+│   ├── register/page.tsx         # Registration authentication route
+│   ├── globals.css               # Design tokens, theme variables, and reset
+│   ├── layout.tsx                # Root layout wrapping AppShell & Providers
+│   ├── page.tsx                  # Root route redirect
+│   └── providers.tsx             # TanStack Query & Sonner providers
 ├── components/
-│   ├── auth/
-│   │   ├── auth-card.tsx     # Focused auth page container
-│   │   └── password-input.tsx# Password input with show/hide toggle
-│   ├── common/
-│   │   ├── app-shell.tsx     # Desktop sidebar, mobile drawer, topbar
-│   │   ├── empty-state.tsx   # Reusable empty state component
-│   │   ├── loading-state.tsx # Accessible loading state component
-│   │   ├── error-state.tsx   # Accessible error state component
-│   │   └── index.ts          # Common barrel export
-│   └── ui/                   # Reusable atomic UI components (shadcn/ui)
+│   ├── auth/                     # Reusable auth components
+│   ├── common/                   # Shared shell and state components
+│   ├── tasks/                    # Task management components
+│   └── ui/                       # Reusable atomic UI components (shadcn/ui)
 ├── docs/
-│   └── architecture.md       # Technical architecture specification
+│   └── architecture.md           # Technical architecture specification
+├── hooks/
+│   └── use-tasks.ts              # TanStack Query hooks for task entities
 ├── lib/
 │   ├── validations/
-│   │   └── auth.ts           # Zod login & registration schemas
-│   └── utils.ts              # Class merging utilities
-├── public/                   # Static assets
+│   │   ├── auth.ts               # Auth Zod schemas
+│   │   └── task.ts               # Task Zod validation schemas
+│   └── utils.ts                  # Class merging utilities
 ├── services/
-│   ├── api/                  # API configuration and client modules
+│   ├── api/                      # Future API client configuration
 │   └── mock/
-│       └── auth.ts           # Mock authentication service implementation
+│       ├── auth.ts               # Mock authentication service
+│       └── tasks.ts              # Mock task management service
 └── types/
-    ├── auth.ts               # Authentication domain types
-    └── index.ts              # Global type exports
+    ├── auth.ts                   # Authentication domain types
+    ├── task.ts                   # Task domain models & filter interfaces
+    └── index.ts                  # Global type exports
 ```
