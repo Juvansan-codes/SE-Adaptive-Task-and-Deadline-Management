@@ -1,0 +1,9 @@
+/**
+ * Core type definitions for Adaptive Task & Deadline Management
+ */
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
