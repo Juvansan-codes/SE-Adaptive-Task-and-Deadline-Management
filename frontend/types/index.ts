@@ -12,3 +12,4 @@ export * from "./auth";
 export * from "./task";
 export * from "./dashboard";
 export * from "./schedule";
+export * from "./settings";
