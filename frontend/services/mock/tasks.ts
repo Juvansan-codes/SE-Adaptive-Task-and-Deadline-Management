@@ -143,6 +143,22 @@ const INITIAL_TASKS: Task[] = [
     createdAt: "2026-10-06T11:00:00Z",
     updatedAt: "2026-10-09T16:00:00Z",
   },
+  {
+    id: "task-108",
+    title: "DBMS Assignment: Query Optimization & Indexing",
+    description: "Complete query plan analysis, B-tree index optimizations, and benchmark execution times for relational schemas.",
+    category: "Academics",
+    deadline: "2026-10-12T17:00:00Z",
+    priority: "high",
+    difficulty: "medium",
+    estimatedDuration: 3,
+    completedDuration: 1.5,
+    remainingDuration: 1.5,
+    progress: 50,
+    status: "pending",
+    createdAt: "2026-10-09T08:00:00Z",
+    updatedAt: "2026-10-11T10:00:00Z",
+  },
 ]
 
 // In-memory persistent state during application lifetime
