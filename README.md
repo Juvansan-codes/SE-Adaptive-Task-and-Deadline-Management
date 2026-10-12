@@ -17,4 +17,4 @@ cp .env.example .env.local
 npm run dev
 ```
 
-For detailed frontend documentation, see [frontend/README.md](file:///c:/Users/BENITAA%20E/SE_proj/SE-Adaptive-Task-and-Deadline-Management/frontend/README.md) and [frontend/docs/architecture.md](file:///c:/Users/BENITAA%20E/SE_proj/SE-Adaptive-Task-and-Deadline-Management/frontend/docs/architecture.md).
+For detailed frontend documentation, see [frontend/README.md](frontend/README.md) and [frontend/docs/architecture.md](frontend/docs/architecture.md).
