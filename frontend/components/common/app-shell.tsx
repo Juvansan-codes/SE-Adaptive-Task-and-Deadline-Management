@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   CheckSquare,
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
+import { LoadingState } from "@/components/common/loading-state"
 
 interface NavItem {
   name: string
@@ -36,9 +37,19 @@ const secondaryNavItems: NavItem[] = [
 ]
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
   const pathname = usePathname()
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+
+  const isAuthRoute = pathname === "/login" || pathname === "/register"
+
+  // Automatically redirect unauthenticated users away from protected pages
+  React.useEffect(() => {
+    if (!loading && !user && !isAuthRoute) {
+      router.push("/login")
+    }
+  }, [loading, user, isAuthRoute, router])
 
   // Close mobile menu on Escape key
   React.useEffect(() => {
@@ -82,11 +93,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isLinkActive])
 
   // If on authentication route, render without dashboard shell
-  const isAuthRoute = pathname === "/login" || pathname === "/register"
   if (isAuthRoute) {
     return (
       <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
         {children}
+      </div>
+    )
+  }
+
+  // If unauthenticated or verifying session, show loading while redirecting
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-background">
+        <LoadingState message="Verifying session..." />
       </div>
     )
   }

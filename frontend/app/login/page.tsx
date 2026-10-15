@@ -13,10 +13,18 @@ import { AuthCard } from "@/components/auth/auth-card"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { user, loading } = useAuth()
   const [formError, setFormError] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    if (!loading && user) {
+      router.push("/dashboard")
+    }
+  }, [loading, user, router])
 
   const {
     register,

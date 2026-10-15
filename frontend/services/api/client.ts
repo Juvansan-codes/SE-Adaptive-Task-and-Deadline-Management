@@ -173,6 +173,14 @@ export async function apiClient<T>(
   }
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      const isAuthPath =
+        window.location.pathname.startsWith("/login") ||
+        window.location.pathname.startsWith("/register")
+      if (!isAuthPath) {
+        window.location.href = "/login"
+      }
+    }
     const message = extractErrorMessage(response.status, data)
     throw new ApiClientError(message, response.status, data)
   }
