@@ -5,7 +5,7 @@ import {
   getUpcomingDeadlines,
   getAtRiskTasks,
   getTodaySchedule,
-} from "@/services/mock/dashboard"
+} from "@/services/api/dashboard"
 
 export const DASHBOARD_KEYS = {
   all: ["dashboard"] as const,

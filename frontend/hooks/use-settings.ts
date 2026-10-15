@@ -3,13 +3,13 @@ import {
   getWeeklyAvailability,
   updateWeeklyAvailability,
   resetWeeklyAvailability,
-} from "@/services/mock/availability"
+} from "@/services/api/availability"
 import {
   getProfile,
   updateProfile,
   getPreferences,
   updatePreferences,
-} from "@/services/mock/settings"
+} from "@/services/api/settings"
 import type {
   WeeklyAvailability,
   UserProfile,
@@ -38,7 +38,9 @@ export function useUpdateWeeklyAvailability() {
       updateWeeklyAvailability(newAvailability),
     onSuccess: (data) => {
       queryClient.setQueryData(SETTINGS_KEYS.availability, data)
-      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.availability })
+      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["schedule"] })
     },
   })
 }
@@ -50,7 +52,9 @@ export function useResetWeeklyAvailability() {
     mutationFn: () => resetWeeklyAvailability(),
     onSuccess: (data) => {
       queryClient.setQueryData(SETTINGS_KEYS.availability, data)
-      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.availability })
+      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["schedule"] })
     },
   })
 }
@@ -69,7 +73,9 @@ export function useUpdateProfile() {
     mutationFn: (updates: Partial<UserProfile>) => updateProfile(updates),
     onSuccess: (data) => {
       queryClient.setQueryData(SETTINGS_KEYS.profile, data)
-      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.profile })
+      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["schedule"] })
     },
   })
 }
@@ -89,7 +95,9 @@ export function useUpdatePreferences() {
       updatePreferences(updates),
     onSuccess: (data) => {
       queryClient.setQueryData(SETTINGS_KEYS.preferences, data)
-      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.preferences })
+      queryClient.invalidateQueries({ queryKey: SETTINGS_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["schedule"] })
     },
   })
 }

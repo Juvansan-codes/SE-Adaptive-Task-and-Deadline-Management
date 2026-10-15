@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { AlertCircle, Loader2, KeyRound } from "lucide-react"
 
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth"
-import { mockAuthService } from "@/services/mock/auth"
+import { authService } from "@/services/api/auth"
 import { AuthCard } from "@/components/auth/auth-card"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
@@ -34,7 +34,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setFormError(null)
     try {
-      const result = await mockAuthService.login(data)
+      const result = await authService.login(data)
 
       if (!result.success) {
         setFormError(result.error)

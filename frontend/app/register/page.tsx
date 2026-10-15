@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { AlertCircle, Loader2, Sparkles } from "lucide-react"
 
 import { registerSchema, type RegisterFormData } from "@/lib/validations/auth"
-import { mockAuthService } from "@/services/mock/auth"
+import { authService } from "@/services/api/auth"
 import { AuthCard } from "@/components/auth/auth-card"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setFormError(null)
     try {
-      const result = await mockAuthService.register(data)
+      const result = await authService.register(data)
 
       if (!result.success) {
         setFormError(result.error)
@@ -48,7 +48,7 @@ export default function RegisterPage() {
         return
       }
 
-      toast.success("Account created successfully! Redirecting to dashboard...")
+      toast.success(result.message || "Account created successfully!")
       router.push("/dashboard")
     } catch {
       setFormError("An unexpected error occurred during registration.")

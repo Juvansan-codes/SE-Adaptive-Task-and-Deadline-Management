@@ -4,7 +4,8 @@ import {
   getRecommendedTask,
   getScheduleUpdate,
   dismissScheduleUpdate,
-} from "@/services/mock/schedule"
+  regenerateSchedule,
+} from "@/services/api/schedule"
 
 export const SCHEDULE_KEYS = {
   all: ["schedule"] as const,
@@ -20,10 +21,10 @@ export function useSchedule(date?: string) {
   })
 }
 
-export function useScheduleRecommendedTask() {
+export function useScheduleRecommendedTask(date?: string) {
   return useQuery({
     queryKey: SCHEDULE_KEYS.recommended,
-    queryFn: () => getRecommendedTask(),
+    queryFn: () => getRecommendedTask(date),
   })
 }
 
@@ -41,6 +42,21 @@ export function useDismissScheduleUpdate() {
     mutationFn: () => dismissScheduleUpdate(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SCHEDULE_KEYS.update })
+    },
+  })
+}
+
+export function useRegenerateSchedule() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (date?: string) => regenerateSchedule(date),
+    onSuccess: (_, date) => {
+      queryClient.invalidateQueries({ queryKey: SCHEDULE_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      if (date) {
+        queryClient.invalidateQueries({ queryKey: SCHEDULE_KEYS.day(date) })
+      }
     },
   })
 }

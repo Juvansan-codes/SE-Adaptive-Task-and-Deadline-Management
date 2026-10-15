@@ -243,7 +243,7 @@ export function ProfileSettings() {
       <div className="rounded-lg border border-border bg-card p-6 shadow-2xs">
         <ErrorState
           title="Failed to load profile"
-          message="Unable to retrieve profile information from the mock service."
+          message="Unable to retrieve profile information. Please check your connection."
           onRetry={() => refetch()}
         />
       </div>

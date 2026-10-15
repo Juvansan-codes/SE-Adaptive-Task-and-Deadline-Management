@@ -305,7 +305,7 @@ export function PreferenceSettings() {
       <div className="rounded-lg border border-border bg-card p-6 shadow-2xs">
         <ErrorState
           title="Failed to load preferences"
-          message="Unable to retrieve user preferences from the mock service."
+          message="Unable to retrieve user preferences. Please check your connection."
           onRetry={() => refetch()}
         />
       </div>

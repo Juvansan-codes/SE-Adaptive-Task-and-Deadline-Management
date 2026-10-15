@@ -68,7 +68,7 @@ export function AuthCard({
             className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-normal text-muted-foreground border-border bg-secondary/40"
           >
             <Info className="size-3 text-muted-foreground" />
-            <span>Prototype: Authentication is mocked for UI testing</span>
+            <span>Supabase Auth: Secure JWT Authentication</span>
           </Badge>
         </div>
       </div>

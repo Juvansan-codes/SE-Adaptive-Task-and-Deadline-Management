@@ -6,6 +6,9 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.api.routes.health import router as health_router
 from app.api.routes.tasks import router as tasks_router
+from app.api.routes.dashboard import router as dashboard_router
+from app.api.routes.schedule import router as schedule_router
+from app.api.routes.settings import router as settings_router
 
 
 def create_application() -> FastAPI:
@@ -38,6 +41,9 @@ def create_application() -> FastAPI:
     # Mount API routers under /api
     app.include_router(health_router, prefix=settings.api_prefix)
     app.include_router(tasks_router, prefix=settings.api_prefix)
+    app.include_router(dashboard_router, prefix=settings.api_prefix)
+    app.include_router(schedule_router, prefix=settings.api_prefix)
+    app.include_router(settings_router, prefix=settings.api_prefix)
 
     # Root redirect / status indicator
     @app.get("/", tags=["Root"], include_in_schema=False)

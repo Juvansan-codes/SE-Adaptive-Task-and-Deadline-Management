@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/use-auth"
 
 interface NavItem {
   name: string
@@ -36,6 +37,7 @@ const secondaryNavItems: NavItem[] = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const { user, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 
   // Close mobile menu on Escape key
@@ -334,11 +336,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Right Header Area */}
           <div className="flex items-center gap-2.5">
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="text-xs">
-                Sign in
-              </Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-block text-xs font-medium text-foreground max-w-[140px] truncate" title={user.name || user.email}>
+                  {user.name || user.email}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                  onClick={logout}
+                >
+                  Sign out
+                </Button>
+              </div>
+            ) : (
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="text-xs">
+                  Sign in
+                </Button>
+              </Link>
+            )}
             <Badge
               variant="outline"
               className="hidden sm:flex items-center gap-1.5 py-1 text-xs font-normal border-border bg-background"
