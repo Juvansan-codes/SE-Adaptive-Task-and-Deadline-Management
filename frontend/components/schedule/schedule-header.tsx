@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Plus, RotateCcw } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus, RotateCcw, Zap } from "lucide-react"
 
 import type { DaySchedule } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { DisruptionSimulatorDialog } from "./disruption-simulator-dialog"
 
 interface ScheduleHeaderProps {
   schedule?: DaySchedule
@@ -95,6 +96,22 @@ export function ScheduleHeader({
             <RotateCcw className="size-3.5" />
           </Button>
         )}
+
+        {/* Disruption Simulator Sandbox Trigger */}
+        <DisruptionSimulatorDialog
+          currentDate={schedule?.date}
+          trigger={
+            <Button
+              variant="outline"
+              size="default"
+              className="h-9 px-3 text-[13px] rounded-[6px] gap-1.5 border-dashed border-primary/40 hover:border-primary text-foreground bg-primary/5 hover:bg-primary/10 transition-colors"
+            >
+              <Zap className="size-3.5 text-primary" />
+              <span className="hidden sm:inline">Simulate Disruption</span>
+              <span className="sm:hidden">Simulate</span>
+            </Button>
+          }
+        />
 
         {/* New Task Link */}
         <Link href="/tasks">

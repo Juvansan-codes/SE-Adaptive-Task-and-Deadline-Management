@@ -96,7 +96,8 @@ def authenticated_driver(chrome_driver):
             if auth_data:
                 driver.get("http://localhost:3000/login")
                 driver.execute_script(
-                    f"window.localStorage.setItem('sb-yzkfguqgusupoyfzxrsl-auth-token', {json.dumps(auth_data)});"
+                    "window.localStorage.setItem('sb-yzkfguqgusupoyfzxrsl-auth-token', arguments[0]);",
+                    auth_data,
                 )
                 driver.get("http://localhost:3000/tasks")
                 WebDriverWait(driver, 10).until(
@@ -170,6 +171,58 @@ def pytest_runtest_makereport(item, call):
             "status": status,
         }
         TEST_RECORDS.append(record)
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_sessionfinish(session, exitstatus):
+    """Write execution summary report to TEST_EXECUTION_REPORT.md in root."""
+    if not TEST_RECORDS:
+        return
+
+    report_path = REPO_ROOT / "TEST_EXECUTION_REPORT.md"
+    total_tests = len(TEST_RECORDS)
+    passed_tests = sum(1 for r in TEST_RECORDS if r["status"] == "PASS")
+    failed_tests = total_tests - passed_tests
+    total_time_s = round(sum(r["execution_time_ms"] for r in TEST_RECORDS) / 1000, 2)
+
+    lines = [
+        "# Software Engineering Automated Test Execution Report",
+        "",
+        f"**Repository:** SE - Adaptive Task and Deadline Management  ",
+        f"**Test Framework:** Pytest 8.4.2 + Selenium WebDriver (Headless Chrome)  ",
+        f"**Execution Summary:** {total_tests} Total Tests | **{passed_tests} PASSED** | **{failed_tests} FAILED** | Total Duration: {total_time_s}s  ",
+        "",
+        "## Formal Test Case Execution Matrix",
+        "",
+        "| Test_ID | Module | Test_Scenario | Test_Type (Unit/Selenium) | Preconditions | Test_Steps | Input_Data | Expected_Result | Actual_Result | Execution_Time_ms | Status (PASS/FAIL) |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: |",
+    ]
+
+    for r in TEST_RECORDS:
+        # Sanitize pipe characters and newlines for clean Markdown table rendering
+        def clean(val: Any) -> str:
+            s = str(val).replace("|", "\\|").replace("\n", "<br>")
+            return s.strip()
+
+        line = (
+            f"| {clean(r['test_id'])} "
+            f"| {clean(r['module'])} "
+            f"| {clean(r['scenario'])} "
+            f"| {clean(r['test_type'])} "
+            f"| {clean(r['preconditions'])} "
+            f"| {clean(r['steps'])} "
+            f"| {clean(r['input_data'])} "
+            f"| {clean(r['expected_result'])} "
+            f"| {clean(r['actual_result'])} "
+            f"| {r['execution_time_ms']} "
+            f"| **{r['status']}** |"
+        )
+        lines.append(line)
+
+    lines.append("")
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    print(f"\n[INFO] Generated TEST_EXECUTION_REPORT.md at {report_path}")
 
 
 def record_meta(test_id: str, module: str, scenario: str, test_type: str, preconditions: str, steps: str, input_data: str, expected: str):

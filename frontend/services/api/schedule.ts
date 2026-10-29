@@ -3,7 +3,15 @@
  */
 
 import { apiClient } from "./client"
-import type { DaySchedule, ScheduleItem, ScheduleUpdate } from "@/types"
+import type {
+  DaySchedule,
+  ScheduleItem,
+  ScheduleUpdate,
+  SimulationDisruptionInput,
+  DisruptionSimulationResult,
+  ApplyStrategyRequest,
+  ApplyStrategyResponse,
+} from "@/types"
 
 /**
  * Retrieve the active day's schedule timeline for requested date (or today in user timezone).
@@ -49,10 +57,30 @@ export async function regenerateSchedule(date?: string): Promise<DaySchedule> {
   })
 }
 
+/**
+ * Execute a what-if disruption simulation without mutating database state.
+ */
+export async function simulateDisruption(
+  input: SimulationDisruptionInput
+): Promise<DisruptionSimulationResult> {
+  return apiClient.post<DisruptionSimulationResult>("/schedule/simulate", input)
+}
+
+/**
+ * Commit an approved disruption recovery plan to the database.
+ */
+export async function applyRecoveryStrategy(
+  request: ApplyStrategyRequest
+): Promise<ApplyStrategyResponse> {
+  return apiClient.post<ApplyStrategyResponse>("/schedule/simulate/apply", request)
+}
+
 export const scheduleService = {
   getSchedule,
   getRecommendedTask,
   getScheduleUpdate,
   dismissScheduleUpdate,
   regenerateSchedule,
+  simulateDisruption,
+  applyRecoveryStrategy,
 }

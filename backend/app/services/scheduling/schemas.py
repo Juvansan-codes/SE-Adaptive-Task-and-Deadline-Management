@@ -126,3 +126,93 @@ class ScheduleRegenerationTrigger(BaseModel):
     reasons: List[str] = Field(default_factory=list)
     changes: List[str] = Field(default_factory=list)
     recommended_action: Optional[str] = None
+
+
+DisruptionType = Literal["lost_time", "task_overrun"]
+RecoveryStrategyType = Literal["buffer_absorption", "workload_triage", "deadline_extension"]
+
+
+class SimulationDisruptionInput(BaseModel):
+    """Input parameters for what-if disruption simulation."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    disruption_type: DisruptionType = "lost_time"
+    target_date: Optional[str] = None
+    hours_lost: float = Field(default=0.0, ge=0.0, le=24.0)
+    overrun_task_id: Optional[str] = None
+    additional_hours: float = Field(default=0.0, ge=0.0, le=48.0)
+
+
+class CascadingBreachItem(BaseModel):
+    """Specific task breaching its deadline due to simulated disruption cascade."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    task_id: str
+    title: str
+    category: str
+    priority: str
+    deadline: str
+    remaining_duration: float
+    delay_hours: float
+    breach_magnitude_hours: float
+    risk_level: RiskLevel
+    explanation: str
+
+
+class RecoveryStrategy(BaseModel):
+    """Synthesized mathematical recovery plan to mitigate disruption."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    id: str
+    strategy_type: RecoveryStrategyType
+    title: str
+    description: str
+    badge: str
+    feasibility_score: float
+    stress_index: Literal["low", "moderate", "high"]
+    deadlines_saved_count: int
+    is_recommended: bool = False
+    changes_summary: List[str] = Field(default_factory=list)
+    action_payload: dict = Field(default_factory=dict)
+
+
+class DisruptionSimulationResult(BaseModel):
+    """Complete output of the what-if disruption simulation."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    disruption_type: DisruptionType
+    hours_disrupted: float
+    target_date: str
+    baseline_feasibility_pct: float
+    disrupted_feasibility_pct: float
+    breached_tasks_count: int
+    breached_tasks: List[CascadingBreachItem] = Field(default_factory=list)
+    strategies: List[RecoveryStrategy] = Field(default_factory=list)
+    simulation_timestamp: str
+
+
+class ApplyStrategyRequest(BaseModel):
+    """Payload to commit an approved recovery strategy."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    strategy_id: str
+    strategy_type: RecoveryStrategyType
+    action_payload: dict = Field(default_factory=dict)
+    target_date: Optional[str] = None
+
+
+class ApplyStrategyResponse(BaseModel):
+    """Response returned upon committing a recovery strategy."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    success: bool
+    message: str
+    applied_strategy_name: str
+    changes_applied: List[str] = Field(default_factory=list)
+

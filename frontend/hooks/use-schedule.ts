@@ -5,7 +5,13 @@ import {
   getScheduleUpdate,
   dismissScheduleUpdate,
   regenerateSchedule,
+  simulateDisruption,
+  applyRecoveryStrategy,
 } from "@/services/api/schedule"
+import type {
+  SimulationDisruptionInput,
+  ApplyStrategyRequest,
+} from "@/types"
 
 export const SCHEDULE_KEYS = {
   all: ["schedule"] as const,
@@ -57,6 +63,26 @@ export function useRegenerateSchedule() {
       if (date) {
         queryClient.invalidateQueries({ queryKey: SCHEDULE_KEYS.day(date) })
       }
+    },
+  })
+}
+
+export function useSimulateDisruption() {
+  return useMutation({
+    mutationFn: (input: SimulationDisruptionInput) => simulateDisruption(input),
+  })
+}
+
+export function useApplyRecoveryStrategy() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (request: ApplyStrategyRequest) => applyRecoveryStrategy(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SCHEDULE_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["tasks"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["settings"] })
     },
   })
 }

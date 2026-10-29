@@ -4,7 +4,15 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-from app.services.scheduling.schemas import ScheduleItemStatus
+from app.services.scheduling.schemas import (
+    ScheduleItemStatus,
+    SimulationDisruptionInput,
+    CascadingBreachItem,
+    RecoveryStrategy,
+    DisruptionSimulationResult,
+    ApplyStrategyRequest,
+    ApplyStrategyResponse,
+)
 
 
 class ScheduleItemResponse(BaseModel):

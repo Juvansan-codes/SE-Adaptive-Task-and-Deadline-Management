@@ -1,15 +1,20 @@
 """Schedule service coordinating timeline generation and adaptive rescheduling."""
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.models.task import Task
+from app.models.preferences import UserPreferences
 from app.schemas.schedule import (
     DayScheduleResponse,
     ScheduleItemResponse,
     ScheduleUpdateResponse,
+    SimulationDisruptionInput,
+    DisruptionSimulationResult,
+    ApplyStrategyRequest,
+    ApplyStrategyResponse,
 )
 from app.services.settings_service import SettingsService
 from app.services.scheduling.capacity import resolve_timezone
@@ -17,6 +22,7 @@ from app.services.scheduling.engine import (
     generate_daily_schedule,
     detect_schedule_regeneration_triggers,
 )
+from app.services.scheduling.simulation import simulate_cascading_disruption
 
 
 class ScheduleService:
@@ -148,4 +154,95 @@ class ScheduleService:
         """Recalculate and return dynamic schedule."""
         return ScheduleService.get_daily_schedule(
             db, user_id, date_str, reference_time
+        )
+
+    @staticmethod
+    def simulate_disruption(
+        db: Session,
+        user_id: str,
+        disruption_input: SimulationDisruptionInput,
+        reference_time: Optional[datetime] = None,
+    ) -> DisruptionSimulationResult:
+        """Execute sandbox disruption simulation and return candidate recovery plans."""
+        profile = SettingsService.get_profile(db, user_id)
+        tasks = db.query(Task).filter(Task.user_id == user_id).all()
+        availability_list = SettingsService.get_or_create_availability(db, user_id)
+        preferences = SettingsService.get_or_create_preferences(db, user_id)
+
+        return simulate_cascading_disruption(
+            tasks=tasks,
+            availability_list=availability_list,
+            preferences=preferences,
+            disruption_input=disruption_input,
+            user_timezone=profile.timezone,
+            reference_time=reference_time,
+        )
+
+    @staticmethod
+    def apply_recovery_strategy(
+        db: Session,
+        user_id: str,
+        request: ApplyStrategyRequest,
+    ) -> ApplyStrategyResponse:
+        """Commit an approved recovery strategy to the persistent database."""
+        action = request.action_payload.get("action")
+        applied_name = "Recovery Strategy"
+        changes: List[str] = []
+
+        if action == "update_buffer_strategy":
+            new_strategy = request.action_payload.get("buffer_strategy", "tight")
+            prefs = SettingsService.get_or_create_preferences(db, user_id)
+            old_strat = prefs.buffer_strategy
+            prefs.buffer_strategy = new_strategy
+            db.commit()
+            applied_name = "Elastic Buffer Compression"
+            changes.append(
+                f"Schedule buffer strategy updated from '{old_strat}' to '{new_strategy}'."
+            )
+
+        elif action == "defer_tasks":
+            task_ids = request.action_payload.get("task_ids", [])
+            days_defer = int(request.action_payload.get("days_defer", 3))
+            deferred_titles = []
+            for t_id in task_ids:
+                task = (
+                    db.query(Task)
+                    .filter(Task.id == t_id, Task.user_id == user_id)
+                    .first()
+                )
+                if task:
+                    task.deadline = task.deadline + timedelta(days=days_defer)
+                    deferred_titles.append(task.title)
+            db.commit()
+            applied_name = "Priority-Preserving Triage"
+            changes.append(
+                f"Deferred {len(deferred_titles)} tasks by {days_defer} days: {', '.join(deferred_titles)}."
+            )
+
+        elif action == "extend_deadline":
+            task_id = request.action_payload.get("task_id")
+            new_dl_str = request.action_payload.get("new_deadline")
+            task = (
+                db.query(Task)
+                .filter(Task.id == task_id, Task.user_id == user_id)
+                .first()
+            )
+            if task and new_dl_str:
+                new_dl = datetime.fromisoformat(new_dl_str)
+                task.deadline = new_dl
+                db.commit()
+                applied_name = "Surgical Deadline Extension"
+                changes.append(
+                    f"Extended deadline for '{task.title}' to {new_dl.strftime('%b %d, %Y %H:%M')}."
+                )
+
+        else:
+            applied_name = "Automatic Resilience"
+            changes.append("No modifications needed; schedule is naturally resilient.")
+
+        return ApplyStrategyResponse(
+            success=True,
+            message="Recovery strategy successfully applied.",
+            applied_strategy_name=applied_name,
+            changes_applied=changes,
         )

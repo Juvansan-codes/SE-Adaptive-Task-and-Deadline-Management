@@ -105,12 +105,14 @@ def test_dashboard_recommended_task_card(authenticated_driver):
 
     # Check for recommended task container or stats
     stats_card = wait.until(
-        EC.visibility_of_element_located((By.XPATH, "//div[contains(., 'Available Time') or contains(., 'Scheduled Workload') or contains(., 'Pending Tasks')]"))
+        EC.visibility_of_element_located((By.XPATH, "//div[contains(., 'Available Today') or contains(., 'Pending Tasks')]"))
     )
     assert stats_card.is_displayed()
 
     # Look for recommendation section
-    rec_headers = driver.find_elements(By.XPATH, "//*[contains(text(), 'Recommended') or contains(text(), 'Focus') or contains(text(), 'Next Task')]")
+    rec_headers = wait.until(
+        EC.presence_of_all_elements_located((By.XPATH, "//*[contains(., 'RECOMMENDED NEXT') or contains(., 'Recommended Focus')]"))
+    )
     assert len(rec_headers) > 0
 
 

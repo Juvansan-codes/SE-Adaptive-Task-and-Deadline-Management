@@ -10,6 +10,10 @@ from app.schemas.schedule import (
     DayScheduleResponse,
     ScheduleUpdateResponse,
     RegenerateScheduleRequest,
+    SimulationDisruptionInput,
+    DisruptionSimulationResult,
+    ApplyStrategyRequest,
+    ApplyStrategyResponse,
 )
 from app.services.schedule_service import ScheduleService
 
@@ -61,3 +65,35 @@ def dismiss_schedule_update(
 ):
     """Acknowledge or dismiss schedule update notification."""
     return {"success": True}
+
+
+@router.post("/simulate", response_model=DisruptionSimulationResult)
+def simulate_disruption(
+    payload: SimulationDisruptionInput,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> DisruptionSimulationResult:
+    """
+    Execute a what-if disruption simulation over a 7-day planning horizon.
+    Calculates cascading deadline breaches and returns 3 candidate recovery plans.
+    Idempotent and isolated: zero modifications to persistent state.
+    """
+    return ScheduleService.simulate_disruption(
+        db=db, user_id=current_user.id, disruption_input=payload
+    )
+
+
+@router.post("/simulate/apply", response_model=ApplyStrategyResponse)
+def apply_recovery_strategy(
+    payload: ApplyStrategyRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ApplyStrategyResponse:
+    """
+    Commit a selected disruption recovery plan to the database.
+    Updates relevant buffer strategy, deferred task deadlines, or specific task parameters.
+    """
+    return ScheduleService.apply_recovery_strategy(
+        db=db, user_id=current_user.id, request=payload
+    )
+
