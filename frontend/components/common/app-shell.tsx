@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // If on authentication route, render without dashboard shell
   if (isAuthRoute) {
     return (
-      <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
+      <div suppressHydrationWarning className="min-h-screen w-full bg-background text-foreground flex flex-col">
         {children}
       </div>
     )
@@ -104,14 +104,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // If unauthenticated or verifying session, show loading while redirecting
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-background">
+      <div suppressHydrationWarning className="flex min-h-screen w-full items-center justify-center bg-background">
         <LoadingState message="Verifying session..." />
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-background text-foreground">
+    <div suppressHydrationWarning className="flex min-h-screen w-full bg-background text-foreground">
       {/* Accessibility Skip Link */}
       <a
         href="#main-content"

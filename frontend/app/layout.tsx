@@ -29,10 +29,36 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const observer = new MutationObserver((mutations) => {
+                  for (let i = 0; i < mutations.length; i++) {
+                    const m = mutations[i];
+                    if (m.type === 'attributes') {
+                      const name = m.attributeName;
+                      if (name && (name === 'bis_skin_checked' || name === 'bis_register' || name.startsWith('__processed_'))) {
+                        m.target.removeAttribute(name);
+                      }
+                    }
+                  }
+                });
+                observer.observe(document.documentElement, { attributes: true, subtree: true });
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body
+        className="min-h-full flex flex-col bg-background text-foreground"
+        suppressHydrationWarning
+      >
         <Providers>
-          <Suspense fallback={<div className="min-h-screen w-full bg-background" />}>
+          <Suspense fallback={<div suppressHydrationWarning className="min-h-screen w-full bg-background" />}>
             <AppShell>{children}</AppShell>
           </Suspense>
         </Providers>

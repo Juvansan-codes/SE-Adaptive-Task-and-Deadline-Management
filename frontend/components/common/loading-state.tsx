@@ -23,6 +23,7 @@ export function LoadingState({
 
   return (
     <div
+      suppressHydrationWarning
       className={cn(
         "flex min-h-[200px] w-full flex-col items-center justify-center p-6 text-center",
         className
