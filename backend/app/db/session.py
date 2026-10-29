@@ -19,19 +19,27 @@ engine: Optional[Engine] = None
 SessionLocal: Optional[sessionmaker[Session]] = None
 
 if settings.sync_database_url:
+    connect_args = {}
+    engine_kwargs = {}
+    if "sqlite" in settings.sync_database_url.lower():
+        connect_args["check_same_thread"] = False
+    else:
+        connect_args["connect_timeout"] = 5
+        engine_kwargs["pool_pre_ping"] = True
+        engine_kwargs["pool_recycle"] = 300
+
     engine = create_engine(
         settings.sync_database_url,
-        pool_pre_ping=True,
-        pool_recycle=300,
-        connect_args={"connect_timeout": 5},
+        connect_args=connect_args,
         echo=False,
+        **engine_kwargs,
     )
     SessionLocal = sessionmaker(
         autocommit=False,
         autoflush=False,
         bind=engine,
     )
-    logger.info("Initialized Supabase PostgreSQL database engine.")
+    logger.info("Initialized database engine with URL: %s", settings.sync_database_url)
 else:
     logger.warning("DATABASE_URL is not configured; database engine is uninitialized.")
 
@@ -67,10 +75,16 @@ def get_db() -> Generator[Session, None, None]:
     try:
         yield db
     except Exception:
-        db.rollback()
+        try:
+            db.rollback()
+        except Exception:
+            pass
         raise
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 def ping_database(db: Session) -> bool:

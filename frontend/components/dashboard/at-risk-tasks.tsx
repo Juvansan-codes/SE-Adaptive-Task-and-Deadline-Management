@@ -27,19 +27,19 @@ export function AtRiskTasks({
     return (
       <div
         className={cn(
-          "flex flex-col rounded-lg border border-border bg-card p-5 shadow-2xs animate-pulse",
+          "flex flex-col rounded-[10px] border border-border bg-card p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] animate-pulse",
           className
         )}
       >
-        <div className="flex items-center justify-between pb-4">
-          <div className="h-5 w-32 rounded bg-muted/70" />
+        <div className="flex items-center justify-between pb-3.5 border-b border-border/70">
+          <div className="h-4 w-32 rounded bg-muted/70" />
           <div className="h-4 w-12 rounded bg-muted/50" />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3 pt-3">
           {Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
-              className="flex flex-col gap-2 rounded-md border border-border p-3"
+              className="flex flex-col gap-2 rounded-[6px] border border-border p-3"
             >
               <div className="h-4 w-40 rounded bg-muted/70" />
               <div className="h-3 w-64 rounded bg-muted/50" />
@@ -53,40 +53,37 @@ export function AtRiskTasks({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-lg border border-border bg-card p-5 shadow-2xs",
+        "flex flex-col rounded-[10px] border border-border bg-card p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
         className
       )}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-border/70">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between pb-3 border-b border-border/70">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold tracking-tight text-foreground">
+          <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
             At-Risk Tasks
           </h3>
           {atRiskTasks.length > 0 && (
             <Badge
               variant="outline"
-              className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 text-[10px] px-1.5 py-0"
+              className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 text-[10px] px-1.5 py-0 rounded-[6px]"
             >
               {atRiskTasks.length} Flagged
             </Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground hidden sm:block">
+        <p className="text-xs text-muted-foreground hidden sm:block font-normal">
           Tasks requiring adaptive intervention
         </p>
       </div>
 
       {/* List or Empty State */}
       {atRiskTasks.length === 0 ? (
-        <div className="pt-4">
-          <EmptyState
-            icon={ShieldCheck}
-            title="No at-risk tasks"
-            description="All scheduled workloads are within safe buffers and deadlines are on track."
-            className="min-h-[180px] p-4"
-          />
-        </div>
+        <EmptyState
+          icon={ShieldCheck}
+          title="No at-risk tasks"
+          description="All scheduled workloads are within safe buffers and deadlines are on track."
+        />
       ) : (
         <div className="divide-y divide-border/60">
           {atRiskTasks.map(({ task, riskLevel, riskReason }) => (
@@ -112,7 +109,7 @@ export function AtRiskTasks({
               {/* Risk Alert Callout */}
               <div
                 className={cn(
-                  "flex items-start gap-2 rounded-md border p-2.5 text-xs leading-relaxed",
+                  "flex items-start gap-2 rounded-[6px] border p-2.5 text-xs leading-relaxed",
                   riskLevel === "critical"
                     ? "border-red-200/80 bg-red-50/60 text-red-800 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300"
                     : "border-orange-200/80 bg-orange-50/60 text-orange-800 dark:border-orange-900/40 dark:bg-orange-950/30 dark:text-orange-300"

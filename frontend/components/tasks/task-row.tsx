@@ -38,7 +38,7 @@ export function TaskRow({
   return (
     <div
       className={cn(
-        "group flex items-center justify-between gap-3 rounded-md border border-border bg-card px-4 py-3 transition-colors hover:bg-neutral-50/60 dark:hover:bg-neutral-900/60",
+        "group flex items-center justify-between gap-3 rounded-[6px] border border-border bg-card px-4 py-2.5 transition-colors hover:bg-neutral-50/60 dark:hover:bg-neutral-900/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)]",
         isCompleted && "opacity-80 bg-neutral-50/30",
         className
       )}
@@ -56,7 +56,7 @@ export function TaskRow({
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
             <span className="font-normal">{task.category}</span>
             <span>•</span>
-            <span className="tabular-nums">
+            <span className="font-mono tabular-nums">
               {task.completedDuration}h of {task.estimatedDuration}h
             </span>
             <span className="sm:hidden">•</span>
@@ -77,10 +77,10 @@ export function TaskRow({
       {/* Actions */}
       <div className="flex items-center gap-1 shrink-0">
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" className="size-8 text-muted-foreground" aria-label="Task options" />}>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" className="size-8 rounded-[6px] text-muted-foreground" aria-label="Task options" />}>
             <MoreHorizontal className="size-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuContent align="end" className="w-40 rounded-[8px]">
             <DropdownMenuItem render={<Link href={`/tasks/${task.id}`} className="w-full" />}>
               View Details
             </DropdownMenuItem>

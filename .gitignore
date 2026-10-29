@@ -20,6 +20,20 @@ out/
 *.sqlite
 *.sqlite3
 
+# Python caches and virtual environments
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+*/.venv/
+.pytest_cache/
+*/.pytest_cache/
+
+# Local tokens and credentials
+auth_token.json
+*token*.json
+
 # OS files
 .DS_Store
 Thumbs.db

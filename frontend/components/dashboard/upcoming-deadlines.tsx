@@ -27,19 +27,19 @@ export function UpcomingDeadlines({
     return (
       <div
         className={cn(
-          "flex flex-col rounded-lg border border-border bg-card p-5 shadow-2xs animate-pulse",
+          "flex flex-col rounded-[10px] border border-border bg-card p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] animate-pulse",
           className
         )}
       >
-        <div className="flex items-center justify-between pb-4">
-          <div className="h-5 w-36 rounded bg-muted/70" />
+        <div className="flex items-center justify-between pb-3 border-b border-border/70">
+          <div className="h-4 w-36 rounded bg-muted/70" />
           <div className="h-4 w-16 rounded bg-muted/50" />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3 pt-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="flex items-center justify-between rounded-md border border-border p-3"
+              className="flex items-center justify-between rounded-[6px] border border-border p-3"
             >
               <div className="space-y-2">
                 <div className="h-4 w-48 rounded bg-muted/70" />
@@ -56,22 +56,22 @@ export function UpcomingDeadlines({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-lg border border-border bg-card p-5 shadow-2xs",
+        "flex flex-col rounded-[10px] border border-border bg-card p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
         className
       )}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-border/70">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between pb-3 border-b border-border/70">
         <div>
-          <h3 className="text-sm font-semibold tracking-tight text-foreground">
+          <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
             Upcoming Deadlines
           </h3>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground font-normal">
             Imminent target milestones in chronological order
           </p>
         </div>
         <Link href="/tasks">
-          <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
+          <Button variant="ghost" size="sm" className="h-8 px-2.5 gap-1 text-xs">
             <span>View all</span>
             <ArrowRight className="size-3" />
           </Button>
@@ -80,20 +80,17 @@ export function UpcomingDeadlines({
 
       {/* Task List or Empty State */}
       {tasks.length === 0 ? (
-        <div className="pt-4">
-          <EmptyState
-            icon={Calendar}
-            title="No upcoming deadlines"
-            description="All scheduled tasks for the next 7 days have either been completed or none exist."
-            className="min-h-[180px] p-4"
-          />
-        </div>
+        <EmptyState
+          icon={Calendar}
+          title="No upcoming deadlines"
+          description="All scheduled tasks for the next 7 days have either been completed or none exist."
+        />
       ) : (
         <div className="divide-y divide-border/60">
           {tasks.map((task) => (
             <div
               key={task.id}
-              className="group flex flex-col gap-2 py-3.5 first:pt-3.5 last:pb-1 sm:flex-row sm:items-center sm:justify-between transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-900/40 rounded-sm px-1.5 -mx-1.5"
+              className="group flex flex-col gap-2 py-3 first:pt-3 last:pb-1 sm:flex-row sm:items-center sm:justify-between transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-900/40 rounded-[6px] px-2 -mx-2"
             >
               {/* Task Details & Title */}
               <div className="flex flex-col min-w-0 flex-1">
@@ -110,7 +107,7 @@ export function UpcomingDeadlines({
                   <span>•</span>
                   <span className="inline-flex items-center gap-1">
                     <Clock className="size-3 text-muted-foreground/70" />
-                    <span className="tabular-nums">{task.remainingDuration}h</span> left
+                    <span className="font-mono tabular-nums">{task.remainingDuration}h</span> left
                   </span>
                   <span>•</span>
                   <StatusBadge status={task.status} showIcon={false} />

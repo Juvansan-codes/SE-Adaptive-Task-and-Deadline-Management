@@ -52,6 +52,17 @@ def create_application() -> FastAPI:
             content={"detail": {"status": "error", "message": "Internal server error"}},
         )
 
+    from sqlalchemy.exc import SQLAlchemyError
+
+    @app.exception_handler(SQLAlchemyError)
+    async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+        import logging
+        logging.getLogger(__name__).warning("Database error handled: %s", exc)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={"detail": {"status": "error", "message": "Database connection unavailable"}},
+        )
+
     # Mount API routers under /api
     app.include_router(health_router, prefix=settings.api_prefix)
     app.include_router(tasks_router, prefix=settings.api_prefix)

@@ -18,7 +18,7 @@ export function TimelineView({ schedule, className }: TimelineViewProps) {
 
   if (items.length === 0) {
     return (
-      <div className={cn("rounded-lg border border-border bg-card p-6 shadow-2xs", className)}>
+      <div className={cn("rounded-[10px] border border-border bg-card p-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]", className)}>
         <EmptyState
           icon={Calendar}
           title="No scheduled items for this date"
@@ -36,12 +36,12 @@ export function TimelineView({ schedule, className }: TimelineViewProps) {
     <div
       id="schedule-timeline"
       className={cn(
-        "flex flex-col rounded-lg border border-border bg-card p-5 sm:p-6 shadow-2xs",
+        "flex flex-col rounded-[10px] border border-border bg-card p-5 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
         className
       )}
     >
       {/* Schedule Meta Sub-bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/80 pb-4 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-3.5 mb-5">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Day Schedule
@@ -52,15 +52,15 @@ export function TimelineView({ schedule, className }: TimelineViewProps) {
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-          <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+          <span className="text-emerald-600 dark:text-emerald-400 font-medium font-mono tabular-nums">
             {completedCount} completed
           </span>
           <span>•</span>
-          <span>{pendingCount} remaining</span>
+          <span className="font-mono tabular-nums">{pendingCount} remaining</span>
           {overdueCount > 0 && (
             <>
               <span>•</span>
-              <span className="text-red-600 dark:text-red-400 font-medium">
+              <span className="text-red-600 dark:text-red-400 font-medium font-mono tabular-nums">
                 {overdueCount} overdue
               </span>
             </>

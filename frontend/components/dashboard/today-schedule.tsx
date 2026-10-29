@@ -25,19 +25,19 @@ export function TodaySchedule({
     return (
       <div
         className={cn(
-          "flex flex-col rounded-lg border border-border bg-card p-5 shadow-2xs animate-pulse",
+          "flex flex-col rounded-[10px] border border-border bg-card p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] animate-pulse",
           className
         )}
       >
-        <div className="flex items-center justify-between pb-4">
-          <div className="h-5 w-28 rounded bg-muted/70" />
+        <div className="flex items-center justify-between pb-3 border-b border-border/70">
+          <div className="h-4 w-28 rounded bg-muted/70" />
           <div className="h-4 w-16 rounded bg-muted/50" />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2.5 pt-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 rounded-md border border-border p-3"
+              className="flex items-center gap-3 rounded-[6px] border border-border p-3"
             >
               <div className="h-8 w-16 rounded bg-muted/60" />
               <div className="space-y-1.5 flex-1">
@@ -81,22 +81,22 @@ export function TodaySchedule({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-lg border border-border bg-card p-5 shadow-2xs",
+        "flex flex-col rounded-[10px] border border-border bg-card p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
         className
       )}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-border/70">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between pb-3 border-b border-border/70">
         <div>
-          <h3 className="text-sm font-semibold tracking-tight text-foreground">
+          <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">
             Today&apos;s Schedule
           </h3>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground font-normal">
             Dynamic focus blocks for today
           </p>
         </div>
         <Link href="/schedule">
-          <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
+          <Button variant="ghost" size="sm" className="h-8 px-2.5 gap-1 text-xs">
             <span>Schedule</span>
             <ArrowRight className="size-3" />
           </Button>
@@ -105,14 +105,11 @@ export function TodaySchedule({
 
       {/* Schedule Items or Empty State */}
       {schedule.length === 0 ? (
-        <div className="pt-4">
-          <EmptyState
-            icon={Calendar}
-            title="No schedule blocks"
-            description="No active schedule sessions allocated for today."
-            className="min-h-[180px] p-4"
-          />
-        </div>
+        <EmptyState
+          icon={Calendar}
+          title="No schedule blocks"
+          description="No active schedule sessions allocated for today."
+        />
       ) : (
         <div className="mt-3.5 flex flex-col gap-2.5">
           {schedule.map((item) => {
@@ -123,16 +120,16 @@ export function TodaySchedule({
               <div
                 key={item.id}
                 className={cn(
-                  "flex items-start gap-3 rounded-md border border-border/70 bg-card p-3 transition-colors hover:border-neutral-300 dark:hover:border-neutral-700",
+                  "flex items-start gap-3 rounded-[6px] border border-border/70 bg-card p-3 transition-colors hover:border-neutral-300 dark:hover:border-neutral-700",
                   config.itemStyle
                 )}
               >
                 {/* Time Indicator */}
-                <div className="flex flex-col items-center justify-center rounded border border-border bg-muted/40 px-2 py-1 text-center shrink-0 w-20">
-                  <span className="text-[11px] font-semibold tracking-tight text-foreground tabular-nums">
+                <div className="flex flex-col items-center justify-center rounded-[4px] border border-border bg-muted/40 px-2 py-1 text-center shrink-0 w-20">
+                  <span className="text-[11px] font-semibold font-mono tracking-tight text-foreground tabular-nums">
                     {item.startTime}
                   </span>
-                  <span className="text-[10px] text-muted-foreground tabular-nums">
+                  <span className="text-[10px] text-muted-foreground font-mono tabular-nums">
                     {item.endTime}
                   </span>
                 </div>
@@ -158,7 +155,7 @@ export function TodaySchedule({
                     <Badge
                       variant="outline"
                       className={cn(
-                        "inline-flex items-center gap-1 text-[10px] px-1.5 py-0 shrink-0",
+                        "inline-flex items-center gap-1 text-[10px] px-1.5 py-0 shrink-0 rounded-[6px]",
                         config.badgeStyle
                       )}
                     >

@@ -20,18 +20,21 @@ export function OverviewStats({
     return (
       <div
         className={cn(
-          "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5",
+          "grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-5 gap-4",
           className
         )}
       >
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-col justify-between rounded-lg border border-border bg-card p-4 shadow-2xs animate-pulse"
+            className="flex flex-col justify-between rounded-[10px] border border-border bg-card p-4 shadow-[0_1px_2px_rgba(0,0,0,0.03)] animate-pulse"
           >
-            <div className="h-3 w-20 rounded bg-muted/60" />
-            <div className="my-2 h-7 w-16 rounded bg-muted/70" />
-            <div className="h-2.5 w-24 rounded bg-muted/40" />
+            <div className="flex items-center justify-between">
+              <div className="h-3 w-20 rounded bg-muted/70" />
+              <div className="size-3.5 rounded bg-muted/60" />
+            </div>
+            <div className="mt-2 h-7 w-16 rounded bg-muted/80" />
+            <div className="mt-2 h-3 w-24 rounded bg-muted/50" />
           </div>
         ))}
       </div>
@@ -85,7 +88,7 @@ export function OverviewStats({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 min-[340px]:grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5",
+        "grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-5 gap-4",
         className
       )}
     >
@@ -95,13 +98,14 @@ export function OverviewStats({
           <div
             key={item.id}
             className={cn(
-              "flex flex-col justify-between rounded-lg border border-border bg-card p-3.5 shadow-2xs transition-colors",
+              "flex flex-col justify-between rounded-[10px] border border-border bg-card p-4 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-colors",
               item.alert &&
                 "border-orange-500/30 bg-orange-500/[0.02] dark:border-orange-500/20"
             )}
           >
+            {/* Top row: micro-icon and uppercase label (flex-between) */}
             <div className="flex items-center justify-between text-muted-foreground">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                 {item.label}
               </span>
               <Icon
@@ -111,19 +115,23 @@ export function OverviewStats({
                 )}
               />
             </div>
-            <div className="my-1.5 flex items-baseline gap-1.5">
+
+            {/* Middle: large tabular number (mt-2 text-[28px] font-bold tabular-nums) */}
+            <div className="mt-2 flex items-baseline">
               <span
                 className={cn(
-                  "text-2xl font-bold tracking-tight text-foreground",
+                  "text-[28px] font-bold font-mono tabular-nums leading-none tracking-tight text-foreground",
                   item.alert && "text-orange-600 dark:text-orange-400"
                 )}
               >
                 {item.value}
               </span>
             </div>
-            <p className="text-[11px] text-muted-foreground truncate">
+
+            {/* Bottom: sub-metric pill/text (mt-1 / mt-2) */}
+            <div className="mt-2 text-xs text-muted-foreground truncate">
               {item.context}
-            </p>
+            </div>
           </div>
         )
       })}

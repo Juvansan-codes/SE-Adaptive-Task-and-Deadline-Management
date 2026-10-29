@@ -25,12 +25,12 @@ export function ScheduleUpdateBanner({
       role="status"
       aria-live="polite"
       className={cn(
-        "relative flex flex-col gap-3 rounded-lg border border-orange-500/30 bg-orange-500/[0.03] p-4 text-foreground shadow-2xs transition-colors dark:border-orange-500/20 sm:flex-row sm:items-center sm:justify-between sm:p-4.5",
+        "relative flex flex-col gap-3 rounded-[10px] border border-orange-500/30 bg-orange-500/[0.03] p-4 text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-colors dark:border-orange-500/20 sm:flex-row sm:items-center sm:justify-between",
         className
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-orange-500/30 bg-orange-500/10 text-orange-600 dark:text-orange-400">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-[6px] border border-orange-500/30 bg-orange-500/10 text-orange-600 dark:text-orange-400">
           <Sparkles className="size-4" />
         </div>
         <div className="flex flex-col gap-1">
@@ -38,7 +38,7 @@ export function ScheduleUpdateBanner({
             <h4 className="text-sm font-semibold tracking-tight text-foreground">
               {update.title}
             </h4>
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground font-mono">
               • {update.timestamp}
             </span>
           </div>
@@ -63,9 +63,9 @@ export function ScheduleUpdateBanner({
       <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={onViewSchedule}
-          className="border-orange-500/30 text-xs hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 gap-1.5"
+          className="h-9 px-3 text-[13px] rounded-[6px] border-orange-500/30 hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 gap-1.5"
         >
           <span>{update.recommendedAction || "View Updated Schedule"}</span>
           <ArrowDown className="size-3" />
@@ -75,7 +75,7 @@ export function ScheduleUpdateBanner({
             variant="ghost"
             size="icon-sm"
             onClick={onDismiss}
-            className="size-8 text-muted-foreground hover:text-foreground"
+            className="size-8 rounded-[6px] text-muted-foreground hover:text-foreground"
             aria-label="Dismiss notification"
           >
             <X className="size-3.5" />

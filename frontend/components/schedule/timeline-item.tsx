@@ -84,7 +84,7 @@ export function TimelineItem({
       <div className="flex w-20 sm:w-28 flex-col items-end pt-1 shrink-0 text-right">
         <span
           className={cn(
-            "text-xs sm:text-sm font-semibold tracking-tight tabular-nums",
+            "text-xs sm:text-sm font-semibold font-mono tracking-tight tabular-nums",
             isOverdue
               ? "text-red-600 dark:text-red-400"
               : isCompleted
@@ -94,10 +94,10 @@ export function TimelineItem({
         >
           {item.startTime}
         </span>
-        <span className="text-[11px] text-muted-foreground tabular-nums">
+        <span className="text-[11px] text-muted-foreground font-mono tabular-nums">
           {item.endTime}
         </span>
-        <span className="mt-1 inline-flex items-center gap-1 rounded bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground tabular-nums">
+        <span className="mt-1 inline-flex items-center gap-1 rounded-[4px] bg-muted/60 px-1.5 py-0.5 text-[10px] text-muted-foreground font-mono tabular-nums">
           <Clock className="size-2.5" />
           <span>{formatDuration(item.durationMinutes)}</span>
         </span>
@@ -114,13 +114,13 @@ export function TimelineItem({
       {/* Right Column: Schedule Item Card */}
       <div
         className={cn(
-          "flex-1 pb-6",
+          "flex-1 pb-5",
           isLast && "pb-0"
         )}
       >
         <div
           className={cn(
-            "group relative flex flex-col rounded-lg border border-border bg-card p-4 sm:p-5 shadow-2xs transition-colors hover:border-neutral-300 dark:hover:border-neutral-700",
+            "group relative flex flex-col rounded-[10px] border border-border bg-card p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-colors hover:border-neutral-300 dark:hover:border-neutral-700",
             isRecommended &&
               "border-orange-500/40 bg-orange-500/[0.02] dark:border-orange-500/30",
             isCompleted &&
@@ -135,7 +135,7 @@ export function TimelineItem({
               {isRecommended && (
                 <Badge
                   variant="outline"
-                  className="border-orange-500/40 bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-semibold uppercase tracking-wider"
+                  className="border-orange-500/40 bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-semibold uppercase tracking-wider rounded-[6px]"
                 >
                   RECOMMENDED NEXT
                 </Badge>
@@ -143,7 +143,7 @@ export function TimelineItem({
               {isCompleted && (
                 <Badge
                   variant="outline"
-                  className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400 text-[10px]"
+                  className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400 text-[10px] rounded-[6px]"
                 >
                   Completed
                 </Badge>
@@ -151,7 +151,7 @@ export function TimelineItem({
               {isOverdue && (
                 <Badge
                   variant="outline"
-                  className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 text-[10px] font-medium"
+                  className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 text-[10px] font-medium rounded-[6px]"
                 >
                   Overdue
                 </Badge>
@@ -159,7 +159,7 @@ export function TimelineItem({
               {isInProgress && !isRecommended && (
                 <Badge
                   variant="outline"
-                  className="border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/40 dark:text-orange-400 text-[10px]"
+                  className="border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/40 dark:text-orange-400 text-[10px] rounded-[6px]"
                 >
                   In Progress
                 </Badge>
@@ -198,7 +198,7 @@ export function TimelineItem({
 
           {/* Recommended Reason Box */}
           {isRecommended && item.recommendationReason && (
-            <div className="mt-3 flex items-start gap-2 rounded-md border border-orange-200/60 bg-orange-50/50 p-2.5 text-xs text-orange-950 dark:border-orange-900/30 dark:bg-orange-950/30 dark:text-orange-300">
+            <div className="mt-3 flex items-start gap-2 rounded-[6px] border border-orange-200/60 bg-orange-50/50 p-2.5 text-xs text-orange-950 dark:border-orange-900/30 dark:bg-orange-950/30 dark:text-orange-300">
               <Sparkles className="size-3.5 shrink-0 text-orange-500 mt-0.5" />
               <div className="flex-1 leading-relaxed">
                 <span className="font-semibold uppercase tracking-wider text-[10px] mr-1.5">
@@ -211,7 +211,7 @@ export function TimelineItem({
 
           {/* Overdue Warning Callout */}
           {isOverdue && item.notes && (
-            <div className="mt-3 flex items-start gap-2 rounded-md border border-red-200/60 bg-red-50/50 p-2.5 text-xs text-red-950 dark:border-red-900/30 dark:bg-red-950/30 dark:text-red-300">
+            <div className="mt-3 flex items-start gap-2 rounded-[6px] border border-red-200/60 bg-red-50/50 p-2.5 text-xs text-red-950 dark:border-red-900/30 dark:bg-red-950/30 dark:text-red-300">
               <AlertTriangle className="size-3.5 shrink-0 text-red-500 mt-0.5" />
               <div className="flex-1 leading-relaxed">
                 <span className="font-semibold uppercase tracking-wider text-[10px] mr-1.5">

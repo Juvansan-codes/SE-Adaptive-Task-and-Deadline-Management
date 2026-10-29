@@ -20,16 +20,16 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex min-h-[260px] w-full flex-col items-center justify-center rounded-lg border border-border border-dashed bg-secondary/30 p-8 text-center transition-colors",
+        "flex min-h-[220px] w-full flex-col items-center justify-center p-6 text-center transition-colors",
         className
       )}
       role="region"
       aria-label={title}
     >
-      <div className="flex size-11 items-center justify-center rounded-md border border-border bg-background text-muted-foreground shadow-2xs">
-        <Icon className="size-5 text-muted-foreground" />
+      <div className="flex size-9 items-center justify-center rounded-[8px] border border-border bg-muted/60 text-muted-foreground shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <Icon className="size-4 text-muted-foreground" />
       </div>
-      <h3 className="mt-3.5 text-sm font-semibold tracking-tight text-foreground">
+      <h3 className="mt-3 text-sm font-semibold tracking-tight text-foreground">
         {title}
       </h3>
       {description && (
@@ -37,7 +37,7 @@ export function EmptyState({
           {description}
         </p>
       )}
-      {action && <div className="mt-4 flex items-center gap-2">{action}</div>}
+      {action && <div className="mt-3.5 flex items-center gap-2">{action}</div>}
     </div>
   )
 }

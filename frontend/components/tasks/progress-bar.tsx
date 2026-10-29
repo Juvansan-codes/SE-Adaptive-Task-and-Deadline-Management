@@ -25,9 +25,9 @@ export function ProgressBar({
     <div className={cn("flex flex-col gap-1 w-full", className)}>
       {showLabel && (
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{safeProgress}%</span>
+          <span className="font-semibold font-mono tabular-nums text-foreground">{safeProgress}%</span>
           {completedDuration !== undefined && estimatedDuration !== undefined && (
-            <span className="tabular-nums">
+            <span className="font-mono tabular-nums">
               {completedDuration}h / {estimatedDuration}h
             </span>
           )}

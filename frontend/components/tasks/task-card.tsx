@@ -40,7 +40,7 @@ export function TaskCard({
   return (
     <div
       className={cn(
-        "group flex flex-col justify-between rounded-lg border border-border bg-card p-4 transition-all hover:border-neutral-400/60 dark:hover:border-neutral-700 shadow-2xs",
+        "group flex flex-col justify-between rounded-[10px] border border-border bg-card p-4 transition-all hover:border-neutral-300 dark:hover:border-neutral-700 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
         isCompleted && "bg-neutral-50/50 dark:bg-neutral-900/40 opacity-90",
         className
       )}
@@ -49,7 +49,7 @@ export function TaskCard({
         {/* Top Badges & Actions */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="rounded bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground border border-border/50">
+            <span className="rounded-[6px] bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground border border-border/50">
               {task.category}
             </span>
             <PriorityBadge priority={task.priority} />
@@ -58,10 +58,10 @@ export function TaskCard({
 
           {/* Context Actions */}
           <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" className="size-7 text-muted-foreground" aria-label="Task options" />}>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" className="size-7 rounded-[6px] text-muted-foreground" aria-label="Task options" />}>
               <MoreHorizontal className="size-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuContent align="end" className="w-44 rounded-[8px]">
               <DropdownMenuItem render={<Link href={`/tasks/${task.id}`} className="flex items-center gap-2 w-full" />}>
                 <ArrowRight className="size-3.5" />
                 <span>View Details</span>

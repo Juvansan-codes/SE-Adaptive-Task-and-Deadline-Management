@@ -1,4 +1,5 @@
 "use client"
+
 import * as React from "react"
 import {
   Search,
@@ -43,6 +44,7 @@ import {
 import { EmptyState } from "@/components/common/empty-state"
 import { LoadingState } from "@/components/common/loading-state"
 import { ErrorState } from "@/components/common/error-state"
+
 export function TaskList() {
   // Filter and view state
   const [search, setSearch] = React.useState("")
@@ -51,10 +53,12 @@ export function TaskList() {
   const [category, setCategory] = React.useState<string>("all")
   const [sortBy, setSortBy] = React.useState<NonNullable<TaskFilterOptions["sortBy"]>>("deadline")
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid")
+
   // Modal dialog states
   const [formOpen, setFormOpen] = React.useState(false)
   const [editingTask, setEditingTask] = React.useState<Task | null>(null)
   const [deletingTask, setDeletingTask] = React.useState<Task | null>(null)
+
   // Service queries & mutations
   const filterOptions: TaskFilterOptions = React.useMemo(
     () => ({
@@ -67,11 +71,13 @@ export function TaskList() {
     }),
     [search, status, priority, category, sortBy]
   )
+
   const { data: tasks, isLoading, isError, error, refetch } = useTasks(filterOptions)
   const { data: categories = [] } = useCategories()
   const deleteTask = useDeleteTask()
   const updateStatus = useUpdateTaskStatus()
   const seedTasks = useSeedTasks()
+
   // Clear filters
   const hasActiveFilters = search !== "" || status !== "all" || priority !== "all" || category !== "all"
   const handleClearFilters = () => {
@@ -81,6 +87,7 @@ export function TaskList() {
     setCategory("all")
     setSortBy("deadline")
   }
+
   // Quick status toggle
   const handleStatusChange = async (task: Task, newStatus: TaskStatus) => {
     try {
@@ -94,6 +101,7 @@ export function TaskList() {
       toast.error("Failed to update status.")
     }
   }
+
   // Handle delete execution
   const handleConfirmDelete = async () => {
     if (!deletingTask) return
@@ -105,33 +113,36 @@ export function TaskList() {
       toast.error("Failed to delete task.")
     }
   }
+
   const openCreateDialog = () => {
     setEditingTask(null)
     setFormOpen(true)
   }
+
   const openEditDialog = (task: Task) => {
     setEditingTask(task)
     setFormOpen(true)
   }
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Top Header & Quick Actions */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+          <h1 className="text-2xl font-semibold tracking-[-0.025em] leading-[1.2] text-foreground">
             Tasks
           </h1>
-          <p className="text-xs text-muted-foreground sm:text-sm">
+          <p className="mt-0.5 text-sm font-normal text-muted-foreground">
             Manage objectives, adjust deadlines, and monitor workload distribution.
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* View toggle */}
-          <div className="flex items-center rounded-md border border-border bg-background p-0.5">
+          <div className="flex items-center rounded-[6px] border border-border bg-background p-0.5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon-sm"
-              className="size-7"
+              className="size-7 rounded-[4px]"
               onClick={() => setViewMode("grid")}
               aria-label="Grid view"
             >
@@ -140,7 +151,7 @@ export function TaskList() {
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon-sm"
-              className="size-7"
+              className="size-7 rounded-[4px]"
               onClick={() => setViewMode("list")}
               aria-label="List view"
             >
@@ -149,7 +160,8 @@ export function TaskList() {
           </div>
           <Button
             variant="primary"
-            size="sm"
+            size="default"
+            className="h-9 px-3 text-[13px] rounded-[6px] gap-1.5"
             onClick={openCreateDialog}
           >
             <Plus className="size-3.5" />
@@ -157,8 +169,9 @@ export function TaskList() {
           </Button>
         </div>
       </div>
+
       {/* Filter and Search Bar */}
-      <div className="flex flex-col gap-2.5 rounded-lg border border-border bg-card p-3 shadow-2xs">
+      <div className="flex flex-col gap-2.5 rounded-[10px] border border-border bg-card p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
           {/* Search Input */}
           <div className="relative sm:col-span-2 lg:col-span-2">
@@ -167,7 +180,7 @@ export function TaskList() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tasks, categories..."
-              className="pl-8.5 pr-8 h-9"
+              className="pl-8.5 pr-8 h-9 text-[13px] rounded-[6px]"
             />
             {search && (
               <button
@@ -180,10 +193,11 @@ export function TaskList() {
               </button>
             )}
           </div>
+
           {/* Status Filter */}
           <div>
             <Select value={status} onValueChange={(val) => setStatus(val as TaskStatus | "all")}>
-              <SelectTrigger className="w-full h-9">
+              <SelectTrigger className="w-full h-9 text-[13px] rounded-[6px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -195,10 +209,11 @@ export function TaskList() {
               </SelectContent>
             </Select>
           </div>
+
           {/* Priority Filter */}
           <div>
             <Select value={priority} onValueChange={(val) => setPriority(val as TaskPriority | "all")}>
-              <SelectTrigger className="w-full h-9">
+              <SelectTrigger className="w-full h-9 text-[13px] rounded-[6px]">
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
@@ -210,10 +225,11 @@ export function TaskList() {
               </SelectContent>
             </Select>
           </div>
+
           {/* Sort By Filter */}
           <div>
             <Select value={sortBy} onValueChange={(val) => setSortBy(val as NonNullable<TaskFilterOptions["sortBy"]>)}>
-              <SelectTrigger className="w-full h-9">
+              <SelectTrigger className="w-full h-9 text-[13px] rounded-[6px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -226,14 +242,15 @@ export function TaskList() {
             </Select>
           </div>
         </div>
+
         {/* Category filters & Active reset pill */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/60 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/60 text-xs">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-muted-foreground font-medium mr-1 text-[11px]">Category:</span>
             <button
               type="button"
               onClick={() => setCategory("all")}
-              className={`rounded px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
+              className={`rounded-[6px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
                 category === "all"
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-muted-foreground hover:text-foreground"
@@ -246,7 +263,7 @@ export function TaskList() {
                 key={cat}
                 type="button"
                 onClick={() => setCategory(cat)}
-                className={`rounded px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
+                className={`rounded-[6px] px-2 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
                   category === cat
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-muted-foreground hover:text-foreground"
@@ -261,7 +278,7 @@ export function TaskList() {
               variant="ghost"
               size="sm"
               onClick={handleClearFilters}
-              className="h-6 text-xs text-muted-foreground hover:text-foreground"
+              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
             >
               <X className="size-3" />
               <span>Clear filters</span>
@@ -269,6 +286,7 @@ export function TaskList() {
           )}
         </div>
       </div>
+
       {/* Task List Rendering */}
       {isLoading ? (
         <LoadingState message="Loading tasks from workspace..." />
@@ -305,7 +323,7 @@ export function TaskList() {
           </div>
         )
       ) : (
-        <div className="rounded-lg border border-border bg-card p-8">
+        <div className="rounded-[10px] border border-border bg-card p-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
           <EmptyState
             title={hasActiveFilters ? "No matching tasks found" : "No tasks in workspace"}
             description={
@@ -315,18 +333,19 @@ export function TaskList() {
             }
             action={
               hasActiveFilters ? (
-                <Button variant="outline" size="sm" onClick={handleClearFilters}>
+                <Button variant="outline" size="default" className="h-9 px-3 text-[13px] rounded-[6px]" onClick={handleClearFilters}>
                   Clear all filters
                 </Button>
               ) : (
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                  <Button variant="primary" size="sm" onClick={openCreateDialog}>
+                  <Button variant="primary" size="default" className="h-9 px-3 text-[13px] rounded-[6px] gap-1.5" onClick={openCreateDialog}>
                     <Plus className="size-3.5" />
                     <span>Create First Task</span>
                   </Button>
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="default"
+                    className="h-9 px-3 text-[13px] rounded-[6px] gap-1.5"
                     disabled={seedTasks.isPending}
                     onClick={async () => {
                       try {
@@ -346,18 +365,20 @@ export function TaskList() {
           />
         </div>
       )}
+
       {/* Task Create / Edit Dialog */}
       <TaskForm
         open={formOpen}
         onOpenChange={setFormOpen}
         task={editingTask}
       />
+
       {/* Delete Confirmation Dialog */}
       <Dialog
         open={!!deletingTask}
         onOpenChange={(open) => !open && setDeletingTask(null)}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-[10px]">
           <DialogHeader>
             <DialogTitle>Delete Task</DialogTitle>
             <DialogDescription>
@@ -369,12 +390,13 @@ export function TaskList() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="pt-2">
-            <DialogClose render={<Button variant="outline" size="sm" disabled={deleteTask.isPending} />}>
+            <DialogClose render={<Button variant="outline" size="default" className="h-9 px-3 text-[13px] rounded-[6px]" disabled={deleteTask.isPending} />}>
               Cancel
             </DialogClose>
             <Button
               variant="destructive"
-              size="sm"
+              size="default"
+              className="h-9 px-3 text-[13px] rounded-[6px] gap-1.5"
               onClick={handleConfirmDelete}
               disabled={deleteTask.isPending}
             >

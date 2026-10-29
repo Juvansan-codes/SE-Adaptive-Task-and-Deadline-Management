@@ -69,9 +69,9 @@ export default function SchedulePage() {
 
   if (isScheduleLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <ScheduleHeader onPrevDay={handlePrevDay} onNextDay={handleNextDay} />
-        <div className="rounded-lg border border-border bg-card p-12 shadow-2xs">
+        <div className="rounded-[10px] border border-border bg-card p-12 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
           <LoadingState
             message="Loading timeline schedule..."
             description="Generating dynamic focus blocks and timeline forecast."
@@ -83,7 +83,7 @@ export default function SchedulePage() {
 
   if (isScheduleError || !schedule) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <ScheduleHeader onPrevDay={handlePrevDay} onNextDay={handleNextDay} />
         <ErrorState
           title="Failed to load schedule"
@@ -95,7 +95,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Page Header */}
       <ScheduleHeader
         schedule={schedule}

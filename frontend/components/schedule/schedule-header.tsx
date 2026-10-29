@@ -31,16 +31,16 @@ export function ScheduleHeader({
       {/* Title & Date Heading */}
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+          <h1 className="text-2xl font-semibold tracking-[-0.025em] leading-[1.2] text-foreground">
             Schedule
           </h1>
           {schedule?.isToday && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs rounded-[6px]">
               Today
             </Badge>
           )}
         </div>
-        <p className="mt-0.5 text-sm text-muted-foreground font-medium">
+        <p className="mt-0.5 text-sm text-muted-foreground font-normal">
           {formattedDate}
         </p>
       </div>
@@ -48,24 +48,24 @@ export function ScheduleHeader({
       {/* Controls & Quick Actions */}
       <div className="flex flex-wrap items-center gap-2 pt-1 md:pt-0">
         {/* Date Selector Navigation */}
-        <div className="flex items-center rounded-md border border-border bg-card p-0.5 shadow-2xs">
+        <div className="flex h-9 items-center rounded-[6px] border border-border bg-card p-0.5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={onPrevDay}
-            className="size-7"
+            className="size-7 rounded-[4px]"
             aria-label="Previous day"
           >
             <ChevronLeft className="size-3.5" />
           </Button>
-          <span className="px-2 text-xs font-medium text-foreground tabular-nums">
+          <span className="px-2 text-xs font-medium text-foreground">
             {schedule?.dayOfWeek || "Monday"}
           </span>
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={onNextDay}
-            className="size-7"
+            className="size-7 rounded-[4px]"
             aria-label="Next day"
           >
             <ChevronRight className="size-3.5" />
@@ -73,12 +73,12 @@ export function ScheduleHeader({
         </div>
 
         {/* Capacity Capsule */}
-        <div className="hidden sm:flex items-center rounded-md border border-border bg-card px-2.5 py-1 text-xs text-muted-foreground shadow-2xs">
-          <span className="font-medium text-foreground tabular-nums mr-1">
+        <div className="hidden sm:flex h-9 items-center rounded-[6px] border border-border bg-card px-3 text-xs text-muted-foreground shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <span className="font-semibold text-foreground font-mono tabular-nums mr-1">
             {scheduledHours}h
           </span>
           <span>/</span>
-          <span className="tabular-nums ml-1">
+          <span className="font-mono tabular-nums ml-1">
             {availableHours}h capacity
           </span>
         </div>
@@ -89,7 +89,7 @@ export function ScheduleHeader({
             variant="ghost"
             size="icon-sm"
             onClick={onRefresh}
-            className="size-8 text-muted-foreground hover:text-foreground"
+            className="size-9 rounded-[6px] text-muted-foreground hover:text-foreground"
             title="Refresh schedule"
           >
             <RotateCcw className="size-3.5" />
@@ -98,7 +98,7 @@ export function ScheduleHeader({
 
         {/* New Task Link */}
         <Link href="/tasks">
-          <Button variant="primary" size="sm">
+          <Button variant="primary" size="default" className="h-9 px-3 text-[13px] rounded-[6px] gap-1.5">
             <Plus className="size-3.5" />
             <span>New Task</span>
           </Button>

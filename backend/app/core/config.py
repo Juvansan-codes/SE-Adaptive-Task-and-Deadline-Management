@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     """Configuration settings loaded from environment variables or .env file."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=("backend/.env", ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,

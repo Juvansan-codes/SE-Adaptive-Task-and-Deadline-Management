@@ -106,7 +106,8 @@ export function TaskForm({
         })
       }
     }
-  }, [open, task, reset, existingCategories])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, task, reset])
 
   const onSubmit = async (formData: TaskFormData) => {
     try {

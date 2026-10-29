@@ -14,7 +14,7 @@ export function Providers({ children }: { children: ReactNode }) {
             refetchOnWindowFocus: false,
             retry: (failureCount, error: unknown) => {
               const errStatus = (error as { status?: number })?.status;
-              if (errStatus === 401 || errStatus === 403) {
+              if (errStatus === 401 || errStatus === 403 || errStatus === 503) {
                 return false;
               }
               return failureCount < 2;
