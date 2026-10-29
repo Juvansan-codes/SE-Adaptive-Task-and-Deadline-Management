@@ -56,10 +56,18 @@ class SettingsService:
                 )
                 db.add(record)
                 created_records.append(record)
-            db.commit()
-            for r in created_records:
-                db.refresh(r)
-            existing = created_records
+            try:
+                db.commit()
+                for r in created_records:
+                    db.refresh(r)
+                existing = created_records
+            except Exception:
+                db.rollback()
+                existing = (
+                    db.query(UserAvailability)
+                    .filter(UserAvailability.user_id == user_id)
+                    .all()
+                )
 
         # Return strictly in Monday -> Sunday order
         day_order = {name: i for i, name in enumerate(WEEKDAY_NAMES)}
@@ -85,8 +93,16 @@ class SettingsService:
                 buffer_strategy="moderate",
             )
             db.add(prefs)
-            db.commit()
-            db.refresh(prefs)
+            try:
+                db.commit()
+                db.refresh(prefs)
+            except Exception:
+                db.rollback()
+                prefs = (
+                    db.query(UserPreferences)
+                    .filter(UserPreferences.user_id == user_id)
+                    .first()
+                )
         return prefs
 
     @staticmethod
@@ -102,8 +118,12 @@ class SettingsService:
                 role="student",
             )
             db.add(profile)
-            db.commit()
-            db.refresh(profile)
+            try:
+                db.commit()
+                db.refresh(profile)
+            except Exception:
+                db.rollback()
+                profile = db.query(Profile).filter(Profile.id == user_id).first()
         return profile
 
     @staticmethod

@@ -28,7 +28,12 @@ def create_application() -> FastAPI:
 
     # Configure CORS for local Next.js frontend development server
     # Avoid wildcard with credentials
-    origins = [settings.frontend_origin] if settings.frontend_origin else ["http://localhost:3000"]
+    configured_origin = settings.frontend_origin.rstrip("/") if settings.frontend_origin else "http://localhost:3000"
+    origins = list(set([
+        configured_origin,
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]))
 
     app.add_middleware(
         CORSMiddleware,
@@ -37,6 +42,15 @@ def create_application() -> FastAPI:
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
+
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception):
+        import logging
+        logging.getLogger(__name__).error(f"Unhandled server error: {exc}", exc_info=True)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": {"status": "error", "message": "Internal server error"}},
+        )
 
     # Mount API routers under /api
     app.include_router(health_router, prefix=settings.api_prefix)

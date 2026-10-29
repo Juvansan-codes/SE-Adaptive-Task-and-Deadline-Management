@@ -1,7 +1,7 @@
-"""Supabase Auth JWT verification and user identity dependency."""
-
+import logging
 from typing import Optional
 import jwt
+from jwt import PyJWKClient, PyJWKClientError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
@@ -10,6 +10,19 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.profile import Profile
+
+logger = logging.getLogger(__name__)
+
+_jwks_client: Optional[PyJWKClient] = None
+
+
+def get_jwks_client() -> Optional[PyJWKClient]:
+    """Return a cached PyJWKClient instance for Supabase JWKS verification."""
+    global _jwks_client
+    if _jwks_client is None and settings.supabase_url:
+        jwks_url = f"{settings.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
+        _jwks_client = PyJWKClient(jwks_url, cache_jwk_set=True, lifespan=3600)
+    return _jwks_client
 
 
 class AuthenticatedUser(BaseModel):
@@ -27,9 +40,55 @@ http_bearer = HTTPBearer(auto_error=False)
 
 def verify_supabase_jwt(token: str) -> dict:
     """
-    Cryptographically verify Supabase JWT token using HS256 and SUPABASE_JWT_SECRET.
+    Cryptographically verify Supabase JWT token.
+    Supports:
+    1. Asymmetric algorithms (ES256, RS256, EdDSA) via Supabase JWKS endpoint.
+    2. Symmetric HS256 tokens using SUPABASE_JWT_SECRET (for test environments and fallback).
     Rejects tampered, invalid, or expired tokens.
     """
+    try:
+        unverified_header = jwt.get_unverified_header(token)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"status": "error", "message": "Invalid authentication token"},
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    alg = unverified_header.get("alg", "HS256")
+
+    # If token is signed with an asymmetric algorithm (standard in modern Supabase)
+    if alg in ("ES256", "RS256", "EdDSA"):
+        jwks_client = get_jwks_client()
+        if jwks_client:
+            try:
+                signing_key = jwks_client.get_signing_key_from_jwt(token)
+                payload = jwt.decode(
+                    token,
+                    signing_key.key,
+                    algorithms=[alg],
+                    options={
+                        "verify_signature": True,
+                        "verify_exp": True,
+                        "verify_aud": False,
+                    },
+                )
+                return payload
+            except jwt.ExpiredSignatureError:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail={"status": "error", "message": "Token has expired"},
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            except (jwt.InvalidTokenError, PyJWKClientError) as exc:
+                logger.warning("JWKS verification failed for asymmetric token: %s", exc)
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail={"status": "error", "message": "Invalid authentication token"},
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+    # For HS256 tokens (or tests/fallback)
     secret = settings.supabase_jwt_secret
     if not secret:
         raise HTTPException(
@@ -38,7 +97,6 @@ def verify_supabase_jwt(token: str) -> dict:
         )
 
     try:
-        # Decode and verify HMAC signature and expiration
         payload = jwt.decode(
             token,
             secret,
@@ -46,7 +104,7 @@ def verify_supabase_jwt(token: str) -> dict:
             options={
                 "verify_signature": True,
                 "verify_exp": True,
-                "verify_aud": False,  # Allow varied client audiences if present
+                "verify_aud": False,
             },
         )
         return payload
@@ -56,7 +114,7 @@ def verify_supabase_jwt(token: str) -> dict:
             detail={"status": "error", "message": "Token has expired"},
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except jwt.InvalidTokenError as e:
+    except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"status": "error", "message": "Invalid authentication token"},

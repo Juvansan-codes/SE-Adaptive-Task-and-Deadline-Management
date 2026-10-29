@@ -71,3 +71,33 @@ def test_valid_token_auto_provisions_user_profile(authed_client: TestClient, db_
     assert profile is not None
     assert profile.email == "newstudent@karunya.edu"
     assert profile.name == "New Student"
+
+
+def test_valid_asymmetric_token_verifies(authed_client: TestClient, monkeypatch, db_session):
+    """Asymmetric ES256 Supabase token verified via JWKS public key."""
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from unittest.mock import MagicMock
+    from app.core import auth
+
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    public_key = private_key.public_key()
+
+    token = jwt.encode(
+        {"sub": "user-asym-123", "email": "asym@example.com", "exp": int(time.time() + 3600)},
+        private_key,
+        algorithm="ES256",
+        headers={"kid": "test-key-id"},
+    )
+
+    mock_jwks = MagicMock()
+    mock_signing_key = MagicMock()
+    mock_signing_key.key = public_key
+    mock_jwks.get_signing_key_from_jwt.return_value = mock_signing_key
+
+    monkeypatch.setattr(auth, "get_jwks_client", lambda: mock_jwks)
+
+    response = authed_client.get("/api/tasks", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+    profile = db_session.query(Profile).filter(Profile.id == "user-asym-123").first()
+    assert profile is not None
+    assert profile.email == "asym@example.com"
