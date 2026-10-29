@@ -17,7 +17,10 @@ import {
 } from "@/hooks/use-schedule"
 
 export default function SchedulePage() {
-  const [currentDate] = React.useState("2026-10-12")
+  const [currentDate, setCurrentDate] = React.useState<string>(() => {
+    const today = new Date()
+    return today.toISOString().split("T")[0]
+  })
 
   const {
     data: schedule,
@@ -32,6 +35,18 @@ export default function SchedulePage() {
   } = useScheduleUpdate()
 
   const dismissUpdateMutation = useDismissScheduleUpdate()
+
+  const handlePrevDay = () => {
+    const d = new Date(currentDate)
+    d.setDate(d.getDate() - 1)
+    setCurrentDate(d.toISOString().split("T")[0])
+  }
+
+  const handleNextDay = () => {
+    const d = new Date(currentDate)
+    d.setDate(d.getDate() + 1)
+    setCurrentDate(d.toISOString().split("T")[0])
+  }
 
   const handleRefresh = () => {
     refetchSchedule()
@@ -55,7 +70,7 @@ export default function SchedulePage() {
   if (isScheduleLoading) {
     return (
       <div className="flex flex-col gap-6">
-        <ScheduleHeader />
+        <ScheduleHeader onPrevDay={handlePrevDay} onNextDay={handleNextDay} />
         <div className="rounded-lg border border-border bg-card p-12 shadow-2xs">
           <LoadingState
             message="Loading timeline schedule..."
@@ -69,10 +84,10 @@ export default function SchedulePage() {
   if (isScheduleError || !schedule) {
     return (
       <div className="flex flex-col gap-6">
-        <ScheduleHeader />
+        <ScheduleHeader onPrevDay={handlePrevDay} onNextDay={handleNextDay} />
         <ErrorState
           title="Failed to load schedule"
-          message="Unable to retrieve active timeline sessions from the mock service."
+          message="Unable to retrieve active timeline sessions from the adaptive service."
           onRetry={() => refetchSchedule()}
         />
       </div>
@@ -85,6 +100,8 @@ export default function SchedulePage() {
       <ScheduleHeader
         schedule={schedule}
         onRefresh={handleRefresh}
+        onPrevDay={handlePrevDay}
+        onNextDay={handleNextDay}
       />
 
       {/* Schedule Updated Banner if update data is available */}

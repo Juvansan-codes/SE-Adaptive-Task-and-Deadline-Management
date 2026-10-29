@@ -370,3 +370,14 @@ def test_task_categories_endpoint(authed_client: TestClient):
     res = authed_client.get("/api/tasks/categories", headers=headers)
     assert res.status_code == 200
     assert res.json() == ["Academics", "DevOps"]
+
+
+def test_task_seed_endpoint(authed_client: TestClient):
+    """Verify POST /api/tasks/seed populates sample starter tasks for an empty user."""
+    headers = make_auth_headers(user_id="user-seed-check")
+
+    res = authed_client.post("/api/tasks/seed", headers=headers)
+    assert res.status_code == 200
+    tasks = res.json()
+    assert len(tasks) >= 5
+    assert any("Architecture" in t["title"] for t in tasks)

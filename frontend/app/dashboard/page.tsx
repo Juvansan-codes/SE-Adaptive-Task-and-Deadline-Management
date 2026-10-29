@@ -2,7 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Plus, Calendar, RotateCcw } from "lucide-react"
+import { Plus, Calendar, RotateCcw, Sparkles } from "lucide-react"
+import { toast } from "sonner"
+import { useSeedTasks } from "@/hooks/use-tasks"
 
 import { Button } from "@/components/ui/button"
 import { ErrorState } from "@/components/common/error-state"
@@ -22,6 +24,7 @@ import {
 } from "@/components/dashboard"
 
 export default function DashboardPage() {
+  const seedTasks = useSeedTasks()
   const {
     data: overview,
     isLoading: isOverviewLoading,
@@ -114,6 +117,26 @@ export default function DashboardPage() {
           >
             <RotateCcw className="size-3.5" />
           </Button>
+          {overview && overview.pendingTasksCount === 0 && overview.completedTodayCount === 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={seedTasks.isPending}
+              onClick={async () => {
+                try {
+                  await seedTasks.mutateAsync()
+                  handleRetryAll()
+                  toast.success("Loaded sample starter tasks!")
+                } catch {
+                  toast.error("Failed to load sample tasks.")
+                }
+              }}
+              title="Populate workspace with sample tasks"
+            >
+              <Sparkles className="size-3.5 text-primary" />
+              <span>{seedTasks.isPending ? "Loading..." : "Load Sample Tasks"}</span>
+            </Button>
+          )}
           <Link href="/schedule">
             <Button variant="outline" size="sm">
               <Calendar className="size-3.5" />

@@ -67,6 +67,7 @@ def verify_supabase_jwt(token: str) -> dict:
                     token,
                     signing_key.key,
                     algorithms=[alg],
+                    leeway=60,
                     options={
                         "verify_signature": True,
                         "verify_exp": True,
@@ -101,6 +102,7 @@ def verify_supabase_jwt(token: str) -> dict:
             token,
             secret,
             algorithms=["HS256"],
+            leeway=60,
             options={
                 "verify_signature": True,
                 "verify_exp": True,
@@ -174,6 +176,11 @@ def get_current_user(
             db.rollback()
             # If concurrent creation occurred, retrieve existing
             profile = db.query(Profile).filter(Profile.id == user_id).first()
+
+    # Automatically ensure starter data for demo user
+    if email == "demo@example.com":
+        from app.services.seed_service import ensure_user_seeded
+        ensure_user_seeded(db, user_id=user_id, email=email, name=name)
 
     return AuthenticatedUser(
         id=user_id,

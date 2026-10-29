@@ -25,7 +25,9 @@ def list_tasks(
     priority: Optional[str] = Query(None, description="Filter by priority or 'all'"),
     category: Optional[str] = Query(None, description="Filter by category or 'all'"),
     sort_by: Optional[str] = Query(None, alias="sortBy", description="Sort field: deadline, priority, title, status, progress"),
-    sort_direction: Optional[SortDirection] = Query("asc", alias="sortDirection", description="asc or desc"),
+    sort_by_snake: Optional[str] = Query(None, alias="sort_by", include_in_schema=False),
+    sort_direction: Optional[SortDirection] = Query(None, alias="sortDirection", description="asc or desc"),
+    sort_order: Optional[SortDirection] = Query(None, alias="sort_order", include_in_schema=False),
     current_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> List[TaskResponse]:
@@ -35,8 +37,8 @@ def list_tasks(
         status=status_filter,
         priority=priority,
         category=category,
-        sort_by=sort_by,
-        sort_direction=sort_direction,
+        sort_by=sort_by or sort_by_snake,
+        sort_direction=sort_direction or sort_order or "asc",
     )
     tasks = TaskService.get_user_tasks(db, current_user.id, filters)
     return [TaskResponse.model_validate(t) for t in tasks]
@@ -60,6 +62,18 @@ def get_categories(
 ) -> List[str]:
     """Retrieve distinct list of task categories for the authenticated user."""
     return TaskService.get_user_categories(db, current_user.id)
+
+
+@router.post("/seed", response_model=List[TaskResponse])
+def seed_starter_tasks(
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> List[TaskResponse]:
+    """Seed sample academic microproject tasks for the active user."""
+    from app.services.seed_service import ensure_user_seeded
+    ensure_user_seeded(db, user_id=current_user.id, email=current_user.email, name=current_user.name)
+    tasks = TaskService.get_user_tasks(db, current_user.id, TaskFilterParams())
+    return [TaskResponse.model_validate(t) for t in tasks]
 
 
 @router.get("/{task_id}", response_model=TaskResponse)

@@ -93,3 +93,16 @@ export function useUpdateTaskStatus() {
     },
   })
 }
+
+export function useSeedTasks() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => taskService.seedStarterTasks(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["schedule"] })
+    },
+  })
+}

@@ -84,4 +84,11 @@ export const taskService = {
   async getCategories(): Promise<string[]> {
     return apiClient.get<string[]>("/tasks/categories")
   },
+
+  /**
+   * Seed sample academic microproject tasks.
+   */
+  async seedStarterTasks(): Promise<Task[]> {
+    return apiClient.post<Task[]>("/tasks/seed")
+  },
 }

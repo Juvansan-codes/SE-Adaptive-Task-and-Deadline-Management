@@ -59,6 +59,13 @@ def create_application() -> FastAPI:
     app.include_router(schedule_router, prefix=settings.api_prefix)
     app.include_router(settings_router, prefix=settings.api_prefix)
 
+    from app.db.session import init_db
+    try:
+        init_db()
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("Database initialization check: %s", exc)
+
     # Root redirect / status indicator
     @app.get("/", tags=["Root"], include_in_schema=False)
     def root():

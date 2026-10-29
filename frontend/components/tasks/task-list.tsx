@@ -1,5 +1,4 @@
 "use client"
-
 import * as React from "react"
 import {
   Search,
@@ -9,15 +8,16 @@ import {
   X,
   Trash2,
   Loader2,
+  Sparkles,
 } from "lucide-react"
 import { toast } from "sonner"
-
 import type { Task, TaskFilterOptions, TaskStatus, TaskPriority } from "@/types/task"
 import {
   useTasks,
   useCategories,
   useDeleteTask,
   useUpdateTaskStatus,
+  useSeedTasks,
 } from "@/hooks/use-tasks"
 import { TaskCard } from "./task-card"
 import { TaskRow } from "./task-row"
@@ -43,7 +43,6 @@ import {
 import { EmptyState } from "@/components/common/empty-state"
 import { LoadingState } from "@/components/common/loading-state"
 import { ErrorState } from "@/components/common/error-state"
-
 export function TaskList() {
   // Filter and view state
   const [search, setSearch] = React.useState("")
@@ -52,12 +51,10 @@ export function TaskList() {
   const [category, setCategory] = React.useState<string>("all")
   const [sortBy, setSortBy] = React.useState<NonNullable<TaskFilterOptions["sortBy"]>>("deadline")
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid")
-
   // Modal dialog states
   const [formOpen, setFormOpen] = React.useState(false)
   const [editingTask, setEditingTask] = React.useState<Task | null>(null)
   const [deletingTask, setDeletingTask] = React.useState<Task | null>(null)
-
   // Service queries & mutations
   const filterOptions: TaskFilterOptions = React.useMemo(
     () => ({
@@ -70,15 +67,13 @@ export function TaskList() {
     }),
     [search, status, priority, category, sortBy]
   )
-
   const { data: tasks, isLoading, isError, error, refetch } = useTasks(filterOptions)
   const { data: categories = [] } = useCategories()
   const deleteTask = useDeleteTask()
   const updateStatus = useUpdateTaskStatus()
-
+  const seedTasks = useSeedTasks()
   // Clear filters
   const hasActiveFilters = search !== "" || status !== "all" || priority !== "all" || category !== "all"
-
   const handleClearFilters = () => {
     setSearch("")
     setStatus("all")
@@ -86,7 +81,6 @@ export function TaskList() {
     setCategory("all")
     setSortBy("deadline")
   }
-
   // Quick status toggle
   const handleStatusChange = async (task: Task, newStatus: TaskStatus) => {
     try {
@@ -100,7 +94,6 @@ export function TaskList() {
       toast.error("Failed to update status.")
     }
   }
-
   // Handle delete execution
   const handleConfirmDelete = async () => {
     if (!deletingTask) return
@@ -112,17 +105,14 @@ export function TaskList() {
       toast.error("Failed to delete task.")
     }
   }
-
   const openCreateDialog = () => {
     setEditingTask(null)
     setFormOpen(true)
   }
-
   const openEditDialog = (task: Task) => {
     setEditingTask(task)
     setFormOpen(true)
   }
-
   return (
     <div className="flex flex-col gap-6">
       {/* Top Header & Quick Actions */}
@@ -157,7 +147,6 @@ export function TaskList() {
               <ListIcon className="size-3.5" />
             </Button>
           </div>
-
           <Button
             variant="primary"
             size="sm"
@@ -168,7 +157,6 @@ export function TaskList() {
           </Button>
         </div>
       </div>
-
       {/* Filter and Search Bar */}
       <div className="flex flex-col gap-2.5 rounded-lg border border-border bg-card p-3 shadow-2xs">
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
@@ -192,7 +180,6 @@ export function TaskList() {
               </button>
             )}
           </div>
-
           {/* Status Filter */}
           <div>
             <Select value={status} onValueChange={(val) => setStatus(val as TaskStatus | "all")}>
@@ -208,7 +195,6 @@ export function TaskList() {
               </SelectContent>
             </Select>
           </div>
-
           {/* Priority Filter */}
           <div>
             <Select value={priority} onValueChange={(val) => setPriority(val as TaskPriority | "all")}>
@@ -224,7 +210,6 @@ export function TaskList() {
               </SelectContent>
             </Select>
           </div>
-
           {/* Sort By Filter */}
           <div>
             <Select value={sortBy} onValueChange={(val) => setSortBy(val as NonNullable<TaskFilterOptions["sortBy"]>)}>
@@ -241,7 +226,6 @@ export function TaskList() {
             </Select>
           </div>
         </div>
-
         {/* Category filters & Active reset pill */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/60 text-xs">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -272,7 +256,6 @@ export function TaskList() {
               </button>
             ))}
           </div>
-
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -286,7 +269,6 @@ export function TaskList() {
           )}
         </div>
       </div>
-
       {/* Task List Rendering */}
       {isLoading ? (
         <LoadingState message="Loading tasks from workspace..." />
@@ -337,23 +319,39 @@ export function TaskList() {
                   Clear all filters
                 </Button>
               ) : (
-                <Button variant="primary" size="sm" onClick={openCreateDialog}>
-                  <Plus className="size-3.5" />
-                  <span>Create First Task</span>
-                </Button>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Button variant="primary" size="sm" onClick={openCreateDialog}>
+                    <Plus className="size-3.5" />
+                    <span>Create First Task</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={seedTasks.isPending}
+                    onClick={async () => {
+                      try {
+                        await seedTasks.mutateAsync()
+                        toast.success("Loaded sample starter tasks!")
+                      } catch {
+                        toast.error("Failed to load sample tasks.")
+                      }
+                    }}
+                  >
+                    <Sparkles className="size-3.5 text-primary" />
+                    <span>{seedTasks.isPending ? "Loading..." : "Load Sample Tasks"}</span>
+                  </Button>
+                </div>
               )
             }
           />
         </div>
       )}
-
       {/* Task Create / Edit Dialog */}
       <TaskForm
         open={formOpen}
         onOpenChange={setFormOpen}
         task={editingTask}
       />
-
       {/* Delete Confirmation Dialog */}
       <Dialog
         open={!!deletingTask}
